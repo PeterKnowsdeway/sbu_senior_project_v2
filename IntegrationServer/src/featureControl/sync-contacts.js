@@ -5,9 +5,9 @@ const populateLock = new mutex();
 google.options({auth: OAuth2Client});
 
 
-const service = google.people( {version: 'v1', auth: OAuth2Client});
+const service = google.people( {version: 'v1', auth: OAuth2Client}); //Google Cloud Platform's API for Google contacts: Google People API.
 
-const contactMappingService = require('../services/database-services/contact-mapping-service');
+const contactMappingService = require('../services/database-services/contact-mapping-service'); //Query and manage internal sequilize database
 
 const {getBoardItems} = require('../services/monday-service.js');
 const fs = require('fs');
@@ -78,55 +78,63 @@ async function populateContacts(req, res) {
  */
 async function initalSetupGoogleContacts(boardItems){   //makes new database.
   
-  let boardItemIndex = 0;
-	let doConfig = true;
+  let boardItemIndex = 0; //counter var for while loop
+	let doConfig = true; //One-time true code - this should not exist. Rewrite code
 	
 	await contactMappingService.deleteDatabse();
 	console.log(boardItems.length);
 	
 	while(boardItemIndex < boardItems.length) {
 
-    //I have issues with how they are doing this...
+    // If board is long then sleep briefly to let API rest.
 		if((boardItemIndex + 1) % 27 == 0) {
 			await sleep(20000);
 		}
 
+    // prepare for going through every column of an item (board item):
+    // counter variable (columnValuesIndex), needed part of passed-in item array (boardItem) object, and name from the pass-in item
 		let columnValuesIndex = 0, currentItem = boardItems[boardItemIndex], name = currentItem.name; 
+
+    //Split to get a first/last name (WARNING THIS IS DESTRUCTIVE! Anything after the first two spaces is LOST)
     let arrName = name.split(" ", 2), arrEmails = [], arrPhoneNumber = [], arrNotes = [], itemID = '';
-		
-		if(doConfig)
-		{
+
+    //Goes through all the columns in the board being synced, and
+    //creates a config.json file containing the columnIds from the board matching the titles in the env.
+		if(doConfig) { //occurs once per function call. -- IDK why it's in the while loop frankly.
 			let columnIdConfig = [];
-			if (!(fs.existsSync("./config.json")))
+
+			if (!(fs.existsSync("./config.json"))) //Checks if config exists. If it does, this prevents it from creating a new config
 			{
-				while(columnValuesIndex < currentItem.column_values.length) {
+				while(columnValuesIndex < currentItem.column_values.length) { //Parse every column for the first item to check what columns in env exist
 					let currentColumn = currentItem.column_values[columnValuesIndex]
 					let columnId = currentColumn.id;
 					
-					if (boardItemIndex == 0 && 
+					if (boardItemIndex == 0 && //should always be true && if column is one in the env
               (process.env.WORK_PHONE_TITLE === currentColumn.title || 
                process.env.MOBILE_PHONE_TITLE === currentColumn.title || 
                process.env.EMAIL_PRIMARY_TITLE === currentColumn.title || 
                process.env.EMAIL_SECONDARY_TITLE === currentColumn.title || 
                process.env.NOTES_TITLE === currentColumn.title)) {
 						
-              const obj = {
+              const obj = { //item information 'pairs' are put into this storage object, which will be pushed into config later
                  id: columnId,
                  title: currentColumn.title
               };
 						
-						  columnIdConfig.push(obj);
-						  console.log(currentColumn.title + ' ' + currentColumn.id);
-					}
-					columnValuesIndex++;
-				}
+						  columnIdConfig.push(obj); //array for the obj above.
+						  console.log('Found env title in board: '+ currentColumn.title + ' ' + currentColumn.id);
+					}//end if
+
+					columnValuesIndex++; //counter for inner while loop.
+				} // end of create columnIdConfig while-loop
         
-				const config = {
+				const config = { //final storage container with all obj pairs contained in columnIds field, and createNewDatabase field to prevent deleting and re-creating database.
           "columnIds" : columnIdConfig,
 					"settings": {
-									"createNewDatabase": false
-					 },
+									"createNewDatabase": false //currently not set up to do anything in the ./services/database-services/contact-mapping-service.js or./db???
+					 }
 				};
+
 				await setConfigVariables(config)
 				fs.writeFile("./config.json", JSON.stringify(config), (err) => {
           if (err) return err;
@@ -140,7 +148,8 @@ async function initalSetupGoogleContacts(boardItems){   //makes new database.
 				while(columnValuesIndex < currentItem.column_values.length) {
 					let currentColumn = currentItem.column_values[columnValuesIndex]
 					let columnId = currentColumn.id;
-				
+
+          //if start of new 
 					if (boardItemIndex == 0 && 
               (process.env.WORK_PHONE_TITLE === currentColumn.title || 
                process.env.MOBILE_PHONE_TITLE === currentColumn.title || 
@@ -170,13 +179,14 @@ async function initalSetupGoogleContacts(boardItems){   //makes new database.
 				});
 			}
 			doConfig = false;
+
 		} else {
-      
-			while(columnValuesIndex < currentItem.column_values.length) {			
-				let currentColumn = currentItem.column_values[columnValuesIndex]
-				let columnId = currentColumn.id
+
+			while(columnValuesIndex < currentItem.column_values.length) { //Go through all columns
+				let currentColumn = currentItem.column_values[columnValuesIndex] //
+				let columnId = currentColumn.id //
 				
-				switch(columnId) {
+				switch(columnId) { //store the current column of the item to their respective arrays to prep for push.
 					case configVariables.primaryEmailID:		//Primary Email
 						arrEmails.push({value: currentColumn.text, type: 'work', formattedType: 'Work' });
 						break;

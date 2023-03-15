@@ -2,21 +2,24 @@ const {google} = require('googleapis');
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 google.options({auth: OAuth2Client});
 
-const service = google.people( {version: 'v1', auth: OAuth2Client});
+const service = google.people( {version: 'v1', auth: OAuth2Client}); //Google Cloud Platform's API for Google Contacts: Google People API
 
-const contactMappingService = require('../services/database-services/contact-mapping-service');
+const contactMappingService = require('../services/database-services/contact-mapping-service'); //Query and manage internal sequilize database
 
 
 
 var {configVariables} = require('../config/config-helper.js'); //Object which setconfigVariables fills in the ID for the elements with a matching column found in the .env's title element. Includes a "createNewDatabase" element within it.
 
  console.log("I made it to make-contact.js");
+
+//Self-descriptive. Creates a new contact on contact being generated on Monday.com
+//if this ever aborts due to a mapping already existing, something is very wrong
 async function makeNewContact(req, res){
 	//gets the contact info from monday.com
-  console.log("I made it to make-contact.js");
+  console.log("I made it to makeNewContact");
+
 	let itemMap = req.body.payload.inboundFieldValues.itemMapping
-	let itemID = JSON.stringify(req.body.payload.inboundFieldValues.itemId);
-	
+	let itemID = JSON.stringify(req.body.payload.inboundFieldValues.itemId); //Get itemID from payload (via stringify)
 	let itemMapping = await contactMappingService.getContactMapping(itemID); //Sequilize database. Tries to get itemMapping with the same itemID if it exists for error-handling
 
 	if(itemMapping != null) { // if this occurs, there is either an old database-entry with the same itemID somehow, create was called twice, or the itemIDs are repeating.
@@ -61,7 +64,7 @@ async function makeNewContact(req, res){
   					}
   				]
   	*/
-  	//calls the people api to create a contact with any information that has been put into the new contact. Normally should just be the name
+  	//calls the people api to create a contact with any information that has been put into the new contact. Normally should just be the name unless making a copy of a contact
   	await service.people.createContact({
   		requestBody: {
   			names: [
@@ -83,38 +86,42 @@ async function makeNewContact(req, res){
   						type: 'other',
   						formattedType: 'Other'
   					},
-  				],
-  				phoneNumbers: [
-  					{
-  						value: workPhone,
-  						type: 'work',
-  						formattedType: 'Work'
-  					},	
-  					{
-  						value: mobilePhone,
-  						type: 'mobile',
-  						formattedType: 'Mobile'
-  					},
-  				],
-  				biographies: [
-  					{
-  						value: notes,
-  						contentType: 'TEXT_PLAIN'
-  					}
-  				],
+        ],
+        phoneNumbers: [
+          {
+            value: workPhone,
+            type: 'work',
+            formattedType: 'Work'
+          },	
+          {
+            value: mobilePhone,
+            type: 'mobile',
+            formattedType: 'Mobile'
+          },
+        ],
+        biographies: [
+          {
+            value: notes,
+            contentType: 'TEXT_PLAIN'
+          }
+        ],
   		}
-  	}, async (err, res) => { 
-  			if (err) return console.error('The API returned an error: ' + err)				
-  			await contactMappingService.createContactMapping({
-  				itemID,
-  				resourceName: res.data.resourceName, 
-  				etag: res.data.etag
-  			});	
-  		} 
+  	}, async (err, res) => {
+      if (err) { //something went wrong - print error to console
+        return console.error('The API returned an error: ' + err)
+      }
+
+      await contactMappingService.createContactMapping({
+        itemID,
+        resourceName: res.data.resourceName,
+        etag: res.data.etag
+  			});
+  		}
   	);
+
   	return res.status(200).send({});
 	}
-};
+}; // end create contact
 
 
 
