@@ -1,6 +1,8 @@
 on:
-  pull_request:
+  pull_request: 
+    branches: ["main"]
   push:
+    branches: ["main"]
 jobs:
   build-test:
     name: Build & Test
@@ -8,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2     # checkout the repo
       - run: npm ci                   # install packages
-      - run: npm test                 # run tests (configured to use jest-junit reporter)
+      - run: npm test -- tests/**/*.js                # run tests (configured to use mocha and chai)
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -16,4 +18,4 @@ jobs:
         with:
           name: MOCHA Tests            # Name of the check run which will be created
           path: reports/mocha-*.json    # Path to test results
-          reporter: mocha-junit-reporter        # Format of test results
+          reporter: mocha       # Format of test results
