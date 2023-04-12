@@ -1,7 +1,7 @@
 const { google } = require('googleapis')
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
-const mutex = require('async-mutex').Mutex
-const populateLock = new mutex()
+const Mutex = require('async-mutex').Mutex
+const populateLock = new Mutex()
 google.options({ auth: OAuth2Client })
 
 const service = google.people({ version: 'v1', auth: OAuth2Client })
@@ -78,7 +78,7 @@ async function fetchContacts (req, res) {
  * @returns null.
  */
 async function initalSetupGoogleContacts (boardItems) { // makes new database.
-  boardItemIndex = 0
+  let boardItemIndex = 0
 
   await contactMappingService.deleteDatabse()
   console.log(boardItems.length)
@@ -89,7 +89,6 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
       await sleep(20000)
     }
 
-    const columnValuesIndex = 0
     const currentItem = boardItems[boardItemIndex]
     const name = currentItem.name
     const arrName = name.split(' ', 2)
@@ -138,7 +137,7 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
       await sleep(20000)
     }
 
-    const columnValuesIndex = 0; const currentItem = boardItems[boardItemIndex]; const name = currentItem.name
+    const currentItem = boardItems[boardItemIndex]; const name = currentItem.name
     const arrName = name.split(' ', 2)
 
     const { arrEmails, arrPhoneNumber, arrNotes, itemID } = parseColumnValues(currentItem, configVariables)
@@ -175,8 +174,8 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
       }, async (err, res) => {
         if (err) return console.error('The API returned an error: ' + err)
         else {
-          let update = await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
-          let updatedMapping = itemMapping = await contactMappingService.getContactMapping(itemID)
+          await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
+          const updatedMapping = itemMapping = await contactMappingService.getContactMapping(itemID)
 
           await service.people.updateContact({
             resourceName: updatedMapping.dataValues.resourceName,
@@ -305,8 +304,6 @@ function parseColumnValues (currentItem, configVariables) {
         break
       case configVariables.mobilePhoneID:
         arrPhoneNumber.push({ value: formatPhoneNumber(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
-        break
-        arrPhoneNumber.push({ value: number, type: 'mobile', formattedType: 'Mobile' })
         break
       case configVariables.notesID:
         arrNotes.push({ value: currentColumn.text, contentType: 'TEXT_PLAIN' })
