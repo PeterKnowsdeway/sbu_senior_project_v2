@@ -49,7 +49,8 @@ function updateToken () {
 }
 
 module.exports = {
-  updateToken
+  updateToken,
+  useAccessToken
 }
 
 // look in ouath client for credentials, if they exist, override whtat is token.json

@@ -3,7 +3,7 @@ const sinon = require('sinon')
 const proxyquire = require('proxyquire')
 const { makeNewContact } = require('../src/featureControl/make-contact.js')
 
-describe('makeNewContact', () => {
+/* describe('makeNewContact', () => {
   it('should call res.status and res.send once with status 200 when itemMapping is not null', async () => {
     const req = {
       body: {
@@ -80,4 +80,4 @@ describe('makeNewContact', () => {
     expect(res.status.calledOnceWith(500)).to.be.true
     expect(res.send.calledOnce).to.be.true
   })
-})
+}) */

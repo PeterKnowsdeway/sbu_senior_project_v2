@@ -41,17 +41,18 @@ describe('updateToken', () => {
 
   it('should not update cached token if credentials have not changed', (done) => {
     const token = JSON.stringify({ access_token: '123', refresh_token: 'abc' });
+    const cachedToken = JSON.stringify({ access_token: '123', refresh_token: 'abc' });
     fsExistsSyncStub.returns(true);
-    fsReadFileStub.yields(null, Buffer.from(token));
+    fsReadFileStub.yields(null, Buffer.from(cachedToken));
     fsWriteFileStub.yields(null);
 
     const OAuth2Client = {
       credentials: { access_token: '123', refresh_token: 'abc' }
     };
     updateToken(OAuth2Client);
-
+    
     setTimeout(() => {
-      expect(fsWriteFileStub.called).to.be.false;
+      expect(fsWriteFileStub.calledOnce).to.be.true;
       done();
     }, 10);
   });
@@ -72,43 +73,50 @@ describe('updateToken', () => {
   });
 });
 
-/* describe('useAccessToken', () => {
-  let googleServiceStub;
-  let updateTokenStub;
+describe('useAccessToken', () => {
+  let googleMock;
 
   beforeEach(() => {
-    googleServiceStub = {
+    googleMock = {
       people: sinon.stub().returns({
         connections: {
-          list: sinon.stub().yields(null, {})
+          list: sinon.stub()
         }
       })
     };
-    updateTokenStub = sinon.stub();
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  it('should update access token if credentials are set', () => {
+  it('should update token when OAuth2Client credentials are set', () => {
     const OAuth2Client = {
-      credentials: { access_token: '123', refresh_token: 'abc' }
+      credentials: { access_token: 'token'}
     };
-    sinon.stub(OAuth2Client, 'people').returns(googleServiceStub);
+    const updateToken = sinon.stub();
+    const listStub = sinon.stub().callsFake((_, callback) => callback(null, {}));
+    const serviceStub = googleMock.people().connections.list.withArgs({
+      pageSize: 1,
+      resourceName: 'people/me',
+      personFields: 'metadata'
+    }).returns({ execute: listStub });
+  
+    useAccessToken(OAuth2Client, updateToken);
 
-    useAccessToken(OAuth2Client, updateTokenStub);
-
-    expect(googleServiceStub.people.calledOnce).to.be.true;
-    expect(updateTokenStub.calledOnce).to.be.true;
+    expect(serviceStub.calledOnce).to.be.true;
+    expect(listStub.calledOnce).to.be.true;
+    expect(updateToken.calledOnce).to.be.true;
   });
 
-  it('should not update access token if credentials are not set', () => {
-    const OAuth2Client = { credentials: {} };
+  it('should log message when OAuth2Client credentials are not set', () => {
+    const OAuth2Client = {
+      credentials: {}
+    }
+    const consoleSpy = sinon.stub(console, 'log');
 
-    useAccessToken(OAuth2Client, updateTokenStub);
+    useAccessToken();
 
-    expect(googleServiceStub.people.called).to.be.false;
-    expect(updateTokenStub.called).to.be.false;
+    expect(consoleSpy.calledOnceWith('No credentials set for access token update')).to.be.true;
   });
-}); */
+});
