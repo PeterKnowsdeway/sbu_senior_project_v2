@@ -2,102 +2,113 @@ const chai = require('chai');
 const expect = chai.expect;
 const fs = require('fs');
 const sinon = require('sinon');
+const { google } = require('googleapis');
 
-const { updateToken } = require('../src/OAuth/token-store-periodic.js');
-
-/* describe('updateToken', () => {
-  it('should update token in token.json if credentials have changed', (done) => {
-    // Mock OAuth2Client.credentials to return some values
-    const mockCredentials = {
-      access_token: 'fake-access-token',
-      refresh_token: 'fake-refresh-token',
-      expiry_date: Date.now() + 10, // 1 hour from now
-    };
-    const originalCredentials = Object.assign({}, mockCredentials);
-    require('../src/OAuth/google-auth.js').OAuthClient.credentials = mockCredentials;
-
-    // Make sure token.json file does not exist before running the test
-    if (fs.existsSync('./token.json')) {
-       fs.writeFileSync('./token.json', '{}', 'utf8');
-    }
-
-    // Call updateToken and check if it updates token.json with new credentials
-    updateToken();
-    setTimeout(() => {
-      const updatedCredentials = JSON.parse(fs.readFileSync('./token.json', 'utf8'));
-      expect(updatedCredentials).to.be.closeTo(mockCredentials);
-      expect(updatedCredentials).to.be.closeTo(originalCredentials);
-      done();
-    }, 1000); // wait for 1 second for updateToken to finish
-  });
-
-  it('should not update token in token.json if credentials have not changed', (done) => {
-    // Mock OAuth2Client.credentials to return some values
-    const mockCredentials = {
-      access_token: 'fake-access-token',
-      refresh_token: 'fake-refresh-token',
-      expiry_date: Date.now() + 3600 * 1000, // 1 hour from now
-    };
-    const originalCredentials = Object.assign({}, mockCredentials);
-    require('../src/OAuth/google-auth.js').OAuthClient.credentials = mockCredentials;
-
-    // Create a token.json file with original credentials
-    fs.writeFileSync('./token.json', JSON.stringify(originalCredentials), 'utf8');
-
-    // Call updateToken and check if it updates token.json with new credentials
-    updateToken();
-    setTimeout(() => {
-      const updatedCredentials = JSON.parse(fs.readFileSync('./token.json', 'utf8'));
-      expect(updatedCredentials).to.be.closeTo(originalCredentials);
-      expect(updatedCredentials).to.be.closeTo(mockCredentials);
-      done();
-    }, 1000); // wait for 1 second for updateToken to finish
-  });
-}); */
+const { updateToken, useAccessToken } = require('../src/OAuth/token-store-periodic.js');
 
 describe('updateToken', () => {
-  let credentials;
-  let readFileStub;
-  let writeFileStub;
+  let fsExistsSyncStub;
+  let fsReadFileStub;
+  let fsWriteFileStub;
 
   beforeEach(() => {
-    // Create a dummy credentials object
-    credentials = { access_token: 'dummy_token' };
-    
-    // Stub the `readFile` function so that it returns a buffer containing a JSON-encoded version of the dummy credentials
-    readFileStub = sinon.stub(fs, 'readFile').callsFake((path, options, callback) => {
-      const buffer = Buffer.from(JSON.stringify(credentials));
-      callback(null, buffer);
-    });
-
-    // Stub the `writeFile` function so that it calls the callback without an error
-    writeFileStub = sinon.stub(fs, 'writeFile').callsFake((path, data, callback) => {
-      callback(null);
-    });
+    fsExistsSyncStub = sinon.stub(fs, 'existsSync');
+    fsReadFileStub = sinon.stub(fs, 'readFile');
+    fsWriteFileStub = sinon.stub(fs, 'writeFile');
   });
 
   afterEach(() => {
-    // Restore the original implementations of `readFile` and `writeFile`
-    readFileStub.restore();
-    writeFileStub.restore();
+    sinon.restore();
   });
 
-  it('should update token.json if credentials have changed', (done) => {
-    updateToken();
+  it('should update cached token if credentials have changed', (done) => {
+    const token = JSON.stringify({ access_token: '123', refresh_token: 'abc' });
+    const cachedToken = JSON.stringify({ access_token: '456', refresh_token: 'def' });
+    fsExistsSyncStub.returns(true);
+    fsReadFileStub.yields(null, Buffer.from(cachedToken));
+    fsWriteFileStub.yields(null);
 
-    // Make sure that the `readFile` function was called exactly once with the expected arguments
-    expect(readFileStub.calledOnceWith('./token.json', 'utf8')).to.be.true;
+    const OAuth2Client = {
+      credentials: { access_token: '123', refresh_token: 'abc' }
+    };
+    updateToken(OAuth2Client);
 
-    // Make sure that the `writeFile` function was called exactly once with the expected arguments
-    expect(writeFileStub.calledOnceWith('./token.json', JSON.stringify(credentials))).to.be.true;
-
-    // Wait for the next tick of the event loop to allow the callback of `fs.writeFile` to execute
     setTimeout(() => {
-      // Make sure that the 'Cached token updated' message was printed to the console
-      expect(console.log.calledWith('Cached token updated')).to.be.true;
-
-      // Call `done` to signal that the test has completed
+      expect(fsWriteFileStub.calledOnce).to.be.true;
       done();
-    }, 0);
+    }, 10);
+  });
+
+  it('should not update cached token if credentials have not changed', (done) => {
+    const token = JSON.stringify({ access_token: '123', refresh_token: 'abc' });
+    fsExistsSyncStub.returns(true);
+    fsReadFileStub.yields(null, Buffer.from(token));
+    fsWriteFileStub.yields(null);
+
+    const OAuth2Client = {
+      credentials: { access_token: '123', refresh_token: 'abc' }
+    };
+    updateToken(OAuth2Client);
+
+    setTimeout(() => {
+      expect(fsWriteFileStub.called).to.be.false;
+      done();
+    }, 10);
+  });
+
+  it('should not attempt to update cached token if token.json file does not exist', (done) => {
+    fsExistsSyncStub.returns(false);
+
+    const OAuth2Client = {
+      credentials: { access_token: '123', refresh_token: 'abc' }
+    };
+    updateToken(OAuth2Client);
+
+    setTimeout(() => {
+      expect(fsReadFileStub.called).to.be.false;
+      expect(fsWriteFileStub.called).to.be.false;
+      done();
+    }, 10);
   });
 });
+
+/* describe('useAccessToken', () => {
+  let googleServiceStub;
+  let updateTokenStub;
+
+  beforeEach(() => {
+    googleServiceStub = {
+      people: sinon.stub().returns({
+        connections: {
+          list: sinon.stub().yields(null, {})
+        }
+      })
+    };
+    updateTokenStub = sinon.stub();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should update access token if credentials are set', () => {
+    const OAuth2Client = {
+      credentials: { access_token: '123', refresh_token: 'abc' }
+    };
+    sinon.stub(OAuth2Client, 'people').returns(googleServiceStub);
+
+    useAccessToken(OAuth2Client, updateTokenStub);
+
+    expect(googleServiceStub.people.calledOnce).to.be.true;
+    expect(updateTokenStub.calledOnce).to.be.true;
+  });
+
+  it('should not update access token if credentials are not set', () => {
+    const OAuth2Client = { credentials: {} };
+
+    useAccessToken(OAuth2Client, updateTokenStub);
+
+    expect(googleServiceStub.people.called).to.be.false;
+    expect(updateTokenStub.called).to.be.false;
+  });
+}); */

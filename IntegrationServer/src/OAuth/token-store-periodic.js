@@ -34,7 +34,8 @@ function updateToken () {
   if (fs.existsSync('./token.json')) {
     fs.readFile('./token.json', (err, token) => {
       if (err) return console.error(err)
-      if (!(token === credentials)) {
+      const cachedCredentials = JSON.parse(token.toString());
+      if (JSON.stringify(cachedCredentials) !== credentials) {
         fs.writeFile('./token.json', credentials, (err) => {
           if (err) return console.error(err)
           console.log('Cached token updated')
@@ -44,7 +45,7 @@ function updateToken () {
       }
     })
   }
-  console.log('Update Cached token attemped')
+  console.log('Update Cached token attempted')
 }
 
 module.exports = {
