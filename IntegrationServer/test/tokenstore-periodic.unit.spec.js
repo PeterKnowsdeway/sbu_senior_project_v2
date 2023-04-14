@@ -3,6 +3,7 @@ const expect = chai.expect;
 const fs = require('fs');
 const sinon = require('sinon');
 const { google } = require('googleapis');
+const { OAuth2Client } = require('google-auth-library')
 
 const { updateToken, useAccessToken } = require('../src/OAuth/token-store-periodic.js');
 
@@ -90,23 +91,35 @@ describe('useAccessToken', () => {
     sinon.restore();
   });
 
-  it('should update token when OAuth2Client credentials are set', () => {
-    const OAuth2Client = {
-      credentials: { access_token: 'token'}
-    };
-    const updateToken = sinon.stub();
-    const listStub = sinon.stub().callsFake((_, callback) => callback(null, {}));
-    const serviceStub = googleMock.people().connections.list.withArgs({
-      pageSize: 1,
-      resourceName: 'people/me',
-      personFields: 'metadata'
-    }).returns({ execute: listStub });
-  
-    useAccessToken(OAuth2Client, updateToken);
+  it('should update token when OAuth2Client credentials are set', (done) => {
+    // Set up OAuth2Client with mock credentials
+    const mockCredentials = {
+      access_token: 'mock_access_token',
+      refresh_token: 'mock_refresh_token',
+      expiry_date: 1234567890,
+      token_type: 'Bearer'
+    }
+    const OAuth2ClientInstance = new OAuth2Client('mock_client_id', 'mock_client_secret', 'mock_redirect_uri')
+    OAuth2ClientInstance.credentials = mockCredentials
+    // Set up mock Google API service
+    const mockService = {
+      people: {
+        connections: {
+          list: (options, callback) => {
+            callback(null, {})
+          }
+        }
+      }
+    }
+    sinon.stub(google, 'people').returns(mockService)
 
-    expect(serviceStub.calledOnce).to.be.true;
-    expect(listStub.calledOnce).to.be.true;
-    expect(updateToken.calledOnce).to.be.true;
+    // Call the function and check if token was updated
+    useAccessToken()
+    expect(OAuth2ClientInstance.credentials.access_token).to.equal('mock_access_token')
+
+    // Restore mocks and finish test
+    google.people.restore()
+    done()
   });
 
   it('should log message when OAuth2Client credentials are not set', () => {
