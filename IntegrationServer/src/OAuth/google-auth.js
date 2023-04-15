@@ -1,81 +1,137 @@
-const { google } = require('googleapis')
-const fs = require('fs')
-const NodeCache = require('node-cache')
-const myCache = new NodeCache({ stdTTL: 1000, useClones: false })
+const {google} = require('googleapis');
+const fs = require('fs');
+const readline = require('readline');
+const express = require('express');
+const router = express.Router();
+const redis = require('redis');
+const client = redis.createClient(); //TODO: include proper error checking using try-catch blocks or other mechanisms
+
+console.log('I made it to google-oauth.js');
+
+const { configVariables } = require('../config/config-helper.js');
 
 const OAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.BACK_TO_URL)
-// "232811749250-phji8o1bmnd86b3vff1uetdkp12138vi.apps.googleusercontent.com", //YOUR_CLIENT_ID
-// "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", //YOUR_CLIENT_SECRET
-// "http://localhost:3000/tokenHandle") //backToUrl
+	process.env.GOOGLE_CLIENT_ID,
+	process.env.GOOGLE_CLIENT_SECRET,
+	process.env.BACK_TO_URL)
+	  //'232811749250-phji8o1bmnd86b3vff1uetdkp12138vi.apps.googleusercontent.com', //YOUR_CLIENT_ID
+	  //'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', //YOUR_CLIENT_SECRET
+	  //'http://localhost:3000/tokenHandle') //backToUrl
+
 
 // Declares the necessary scopes from Google
-const SCOPES = ['https://www.googleapis.com/auth/contacts']
-google.options({ auth: OAuth2Client })
+const SCOPES = ['https://www.googleapis.com/auth/contacts'];
+
+// The path to the token file
+const TOKEN_PATH = "./token.json";
+
+// The key for the return URL in the cache
+const RETURN_URL_KEY = "returnURl";
+
+google.options({ auth: OAuth2Client });
 
 /**
- *
- *
  * @param req - The request object.
  * @param res - The response object.
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
-async function setUpOAuth (req, res) {
-  if (fs.existsSync('./token.json')) {
-    fs.readFile('./token.json', (err, token) => {
-      if (err) {
-        console.error(err)
-        return
+async function setUpOAuth (req, res) {	
+  fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
+  .then(() => {
+    fs.promises.readFile(TOKEN_PATH)
+      .then(token => {
+        OAuth2Client.credentials = JSON.parse(token);;
+        const returnUrl = req.session.backToUrl;
+        return res.redirect(returnUrl);
+      })
+      .catch(err => {
+        console.error(err);
+        return res.status(500).send();
+      });
+  })
+  .catch(() => {
+    client.set(RETURN_URL_KEY, req.session.backToUrl, (err, reply) => {
+      if(err) {
+        console.error(err);
+        return res.status(500).send();
       }
-      OAuth2Client.credentials = JSON.parse(token)
-      const returnUrl = req.session.backToUrl
-      return res.redirect(returnUrl)
-    })
-  } else {
-    myCache.set('returnURl', req.session.backToUrl)
-    const url = OAuth2Client.generateAuthUrl({
-      // 'online' (default) or 'offline' (gets refresh_token)
-      access_type: 'offline',
-      // If you only need one scope you can pass it as a string
-      scope: SCOPES
-    })
-    return res.redirect(url)
-  }
+    });
+    try {
+      const url = OAuth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: SCOPES
+      });
+      return res.redirect(url);
+    } catch (err) {
+      console.error("The URL could not be generated", err);
+      return res.status(500).send();
+    }
+  }); 
 }
 
-async function codeHandle(req, res) {
-  const backToUrl = myCache.get('returnUrl');
-  if (!backToUrl) {
-    return res.status(200).send({});
-  }
-
-  try {
-    const TOKEN_PATH = './token.json';
-    let token;
-
-    if (fs.existsSync(TOKEN_PATH)) {
-      token = JSON.parse(fs.readFileSync(TOKEN_PATH));
-      OAuth2Client.setCredentials(token);
-    } else {
-      const { code } = req.query;
-      const { tokens } = await OAuth2Client.getToken(code);
-      token = tokens;
-      fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
-      OAuth2Client.setCredentials(token);
+/*
+ * This function is called when the user is redirected back to the server
+ * after authenticating with Google.
+ *
+ * It takes the code from the query string, gets an access token from Google,
+ * and then redirects the user back to the page they were on before.
+ */
+async function codeHandle (req, res) {
+  client.get(RETURN_URL_KEY, (err, backToUrl) => {
+    if(err) {
+      console.error(err);
+      return res.status(500).send();
     }
-
-    myCache.del('returnUrl');
-    return res.redirect(backToUrl);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send('Error retrieving access token');
-  }
+    if(backToUrl == undefined) {
+      return res.status(200).send({});
+    }
+    client.del(RETURN_URL_KEY, (err, reply) => {
+      if(err) {
+        console.error(err);
+        return res.status(500).send();
+      }
+    });	
+    fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
+    .then(() => {
+      fs.promises.readFile(TOKEN_PATH)
+        .then(token => {
+          OAuth2Client.credentials = JSON.parse(token);
+          return res.redirect(backToUrl);
+        })
+        .catch(err => {
+          console.error(err);
+          return res.status(500).send();
+        });
+    })
+    .catch(() => {
+      const code = req.query["code"];
+      console.log(code);
+      OAuth2Client.getToken(code)
+        .then(token => {
+          OAuth2Client.credentials = token;
+          console.log(token);
+          fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token))
+            .then(() => {
+              console.log("Token stored to", TOKEN_PATH);
+              return res.redirect(backToUrl);
+            })
+            .catch(err => {
+              console.error(err);
+              return res.status(500).send();
+            });
+        })
+        .catch(err => {
+          console.error("Error retrieving access token", err);
+          return res.status(500).send();
+        });
+    });
+  });
 }
 
 module.exports = {
-  codeHandle,
-  setUpOAuth,
-  OAuthClient: OAuth2Client
-}
+	codeHandle,
+	setUpOAuth,
+	'OAuthClient': OAuth2Client
+};
+
+
