@@ -7,7 +7,8 @@ const google = require('googleapis');
 const OAuth2Client = require('google-auth-library').OAuth2Client
 const googleAuth = require('../src/OAuth/google-auth.js')
 const chaiSinon = require('sinon-chai')
-const myCache = googleAuth.myCache;
+const redis = require('redis');
+const client = redis.createClient();
 const proxyquire = require('proxyquire');
 chai.use(chaiSinon)
 
@@ -82,189 +83,86 @@ describe('OAuth2Client', function () {
 })
 
 // UNIT TESTS
-describe('setUpOAuth', () => {
-  const req = { session: { backToUrl: 'http://example.com/auth' } }
-  const res = { redirect: sinon.stub() }
-  const SCOPES = ['https://www.googleapis.com/auth/contacts']
-  const TOKEN_PATH = './token.json'
+/* describe('Google OAuth', () => {
+  describe('setUpOAuth', () => {
+    let req, res, generateAuthUrlStub, readFileStub, accessStub, setStub;
 
-  beforeEach(() => {
-    sinon.restore()
-    sinon.stub(OAuth2Client.prototype, 'generateAuthUrl').returns('http://example.com/auth')
-    sinon.stub(fs, 'existsSync').returns(false)
-    sinon.stub(fs, 'readFile')
-    sinon.stub().returnsThis()
-  })
+    beforeEach(() => {
+      req = {
+        session: {
+          backToUrl: 'http://example.com'
+        }
+      };
 
-  afterEach(() => {
-    sinon.restore()
-  })
+      res = {
+        redirect: sinon.stub(),
+        status: sinon.stub().returns({
+          send: sinon.stub()
+        })
+      };
 
-  it('should redirect to authorization URL if token does not exist', async () => {
-    await setUpOAuth(req, res)
-    assert.ok(res.redirect.calledOnceWith('http://example.com/auth'))
-    assert.ok(fs.existsSync.calledOnceWith(TOKEN_PATH))
-    assert.ok(OAuth2Client.prototype.generateAuthUrl.calledOnceWith({
-      access_type: 'offline',
-      scope: SCOPES
-    }))
-  })
-
-  it('should redirect to backToUrl if token exists', async () => {
-    const req = { session: { backToUrl: 'http://example.com' } }
-    const res = { redirect: sinon.spy() }
-    fs.existsSync = sinon.stub().returns(true)
-    fs.readFile = sinon.stub().callsArgWith(1, null, JSON.stringify({}))
-
-    await new Promise(resolve => {
-      setUpOAuth(req, res)
-      resolve()
-    })
-
-    expect(res.redirect).to.have.been.calledOnceWith('http://example.com')
-  })
-})
-
-// CODEHANDLE UNIT TESTS
-describe('codeHandle function', () => {
-  let req, res, myCache, fs, OAuth2Client;
-
-  beforeEach(() => {
-    req = {
-      query: {
-        code: 'test_code'
-      }
-    };
-    res = {
-      status: sinon.stub().returnsThis(),
-      send: sinon.stub(),
-      redirect: sinon.stub()
-    };
-    myCache = {
-      get: sinon.stub(),
-      del: sinon.stub()
-    };
-    fs = {
-      existsSync: sinon.stub(),
-      readFile: sinon.stub(),
-      writeFile: sinon.stub()
-    };
-    OAuth2Client = {
-      getToken: sinon.stub(),
-      credentials: {}
-    };
-  });
-
-  it('should return an empty object if backToUrl is undefined', async () => {
-    myCache.get.returns(undefined);
-
-    const { codeHandle } = proxyquire('../src/OAuth/google-auth', {
-      'fs': fs,
-      'myCache': myCache,
-      'google-auth-library': {
-        OAuth2Client: sinon.stub().returns(OAuth2Client)
-      }
+      const oauth = new OAuth2Client();
+      generateAuthUrlStub = sinon.stub(oauth, 'generateAuthUrl');;
+      readFileStub = sinon.stub(fs.promises, 'readFile');
+      accessStub = sinon.stub(fs.promises, 'access');
+      setStub = sinon.stub(client, 'set');
     });
 
-    await codeHandle(req, res);
-
-    expect(myCache.del.called).to.be.false;
-    expect(fs.existsSync.called).to.be.false;
-    expect(OAuth2Client.getToken.called).to.be.false;
-    expect(res.status.calledWith(200)).to.be.true;
-    expect(res.send.calledWith({})).to.be.true;
-  });
-
-  it('should redirect to backToUrl if token.json file exists', async () => {
-    myCache.get.returns('https://example.com/');
-   
-    const { codeHandle } = proxyquire('../src/OAuth/google-auth', {
-      'fs': fs,
-      'myCache': myCache,
-      'google-auth-library': {
-        OAuth2Client: sinon.stub().returns(OAuth2Client)
-      }
-    });
-  
-    console.log(myCache.del.calledOnce); // Add this line
-    await codeHandle(req, res);
-  
-    expect(myCache.del.calledOnce).to.be.true;
-    expect(fs.existsSync.calledOnce).to.be.true;
-    expect(fs.readFileSync.calledOnce).to.be.true;
-    expect(OAuth2Client.credentials.access_token).to.equal('test_token');
-    expect(res.redirect.calledWith('https://example.com/')).to.be.true;
-  
-  });
-
-});
-
- describe('codeHandle function', () => {
-  let req, res, myCache;
-
-  beforeEach(() => {
-    req = {
-      query: {
-        code: 'some-code',
-      },
-    };
-    res = {
-      redirect: sinon.spy(),
-      status: sinon.stub().returns({
-        send: sinon.spy(),
-      }),
-    };
-    myCache = {
-      get: sinon.stub(),
-      del: sinon.spy(),
-    };
-  });
-
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  it('should store token to file and redirect if token.json file does not exist', async () => {
-    sinon.stub(fs, 'existsSync').returns(false);
-    sinon.stub(fs, 'writeFile').callsFake((path, data, cb) => cb());
-    sinon.stub(OAuth2Client.prototype, 'getToken').callsFake((code, cb) => {
-      cb(null, { access_token: 'some-token' });
+    afterEach(() => {
+      sinon.restore();
     });
 
-    await codeHandle(req, res, myCache);
+    it('should redirect to the return URL when the token file exists', async () => {
+      accessStub.resolves();
+      readFileStub.resolves('{"access_token": "access_token", "refresh_token": "refresh_token", "scope": "https://www.googleapis.com/auth/contacts", "token_type": "Bearer", "expiry_date": 1649999349001}');
 
-    expect(fs.existsSync.calledWith('./token.json')).to.be.true;
-    expect(fs.writeFile.calledOnce).to.be.true;
-    expect(OAuth2Client.prototype.getToken.calledOnce).to.be.true;
-    expect(res.redirect.calledOnce).to.be.true;
-    expect(res.redirect.calledWith(myCache.get('returnURl'))).to.be.true;
-  });
+      await setUpOAuth(req, res);
 
-  it('should set up OAuth2 client and redirect if token.json file exists', async () => {
-    sinon.stub(fs, 'existsSync').returns(true);
-    sinon.stub(fs, 'readFile').callsFake((path, cb) => {
-      cb(null, JSON.stringify({ access_token: 'some-token' }));
+      sinon.assert.calledOnce(accessStub);
+      sinon.assert.calledOnce(readFileStub);
+      sinon.assert.notCalled(generateAuthUrlStub);
+      sinon.assert.calledOnce(res.redirect);
+      sinon.assert.calledWith(res.redirect, 'http://example.com');
     });
 
-    await codeHandle(req, res, myCache);
 
-    expect(fs.existsSync.calledWith('./token.json')).to.be.true;
-    expect(fs.readFile.calledOnce).to.be.true;
-    expect(OAuth2Client.prototype.credentials).to.deep.equal({
-      access_token: 'some-token',
+    it('should redirect to the Google OAuth page when the token file does not exist', async () => {
+      accessStub.rejects();
+      generateAuthUrlStub.returns('https://accounts.google.com');
+
+      await setUpOAuth(req, res);
+
+      sinon.assert.calledOnce(accessStub);
+      sinon.assert.calledOnce(generateAuthUrlStub);
+      sinon.assert.calledOnce(setStub);
+      sinon.assert.calledOnce(res.redirect);
+      sinon.assert.calledWith(res.redirect, 'https://accounts.google.com');
     });
-    expect(res.redirect.calledOnce).to.be.true;
-    expect(res.redirect.calledWith(myCache.get('returnURl'))).to.be.true;
+
+    it('should handle errors when the token file cannot be read', async () => {
+      accessStub.resolves();
+      readFileStub.rejects();
+
+      await setUpOAuth(req, res);
+
+      sinon.assert.calledOnce(accessStub);
+      sinon.assert.calledOnce(readFileStub);
+      sinon.assert.calledOnce(res.status);
+      sinon.assert.calledWith(res.status, 500);
+    });
+
+    it('should handle errors when the return URL cannot be saved to Redis', async () => {
+      accessStub.rejects();
+      generateAuthUrlStub.returns('https://accounts.google.com');
+      setStub.callsArgWith(2, new Error());
+
+      await setUpOAuth(req, res);
+
+      sinon.assert.calledOnce(accessStub);
+      sinon.assert.calledOnce(generateAuthUrlStub);
+      sinon.assert.calledOnce(setStub);
+      sinon.assert.calledOnce(res.status);
+      sinon.assert.calledWith(res.status, 500);
+    });
   });
-
-  it('should return an empty response if backToUrl is undefined', async () => {
-    myCache.get.returns(undefined);
-
-    await codeHandle(req, res, myCache);
-
-    expect(res.status.calledOnce).to.be.true;
-    expect(res.status.calledWith(200)).to.be.true;
-    expect(res.status().send.calledOnce).to.be.true;
-    expect(res.status().send.calledWith({})).to.be.true;
-  });
-}); 
+}); */

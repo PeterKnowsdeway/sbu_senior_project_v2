@@ -256,6 +256,15 @@ async function initializeConfig (boardItems) {
   }
 }
 
+/**
+ * This function gets the column ids for the columns that have the
+ * titles specified in the .env file.
+ *
+ * @param {object} currentItem
+ * @param {array} columnIdConfig
+ * @param {number} boardItemIndex
+ * @returns {array} columnIdConfig
+ */
 function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   const validTitles = [
     process.env.WORK_PHONE_TITLE,
@@ -283,6 +292,17 @@ function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   return columnIdConfig
 }
 
+/**
+ * This function parses the column values of a given item and returns an object with the following properties:
+ * - arrEmails: An array of objects that contain the email addresses of the given item
+ * - arrPhoneNumber: An array of objects that contain the phone numbers of the given item
+ * - arrNotes: An array of objects that contain the notes of the given item
+ * - itemID: The ID of the given item
+ *
+ * @param {Object} currentItem - The item whose column values are to be parsed
+ * @param {Object} configVariables - An object that contains the IDs of the columns that are to be parsed
+ * @returns {Object} An object with the properties described above
+ */
 function parseColumnValues (currentItem, configVariables) {
   const arrEmails = []
   const arrPhoneNumber = []
@@ -321,6 +341,7 @@ function parseColumnValues (currentItem, configVariables) {
     itemID
   }
 }
+
 
 function formatPhoneNumber (number) {
   if (number.length === 10) {

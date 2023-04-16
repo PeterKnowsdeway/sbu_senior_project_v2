@@ -9,7 +9,6 @@ const AuthenticationMiddleware = require('../middleware/auth-request').authReque
 router.use(rateLimiterUsingThirdParty)
 
 // get the required functions to use.
-console.log('I made it to OAuth-helper.js routes')
 
 router.get('/auth', AuthenticationMiddleware, hanleAuth)
 router.get('/tokenHandle', generateToken)
