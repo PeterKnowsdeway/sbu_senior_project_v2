@@ -1,68 +1,60 @@
 const { expect } = require('chai')
 const sinon = require('sinon')
 const proxyquire = require('proxyquire')
-const { makeNewContact } = require('../src/featureControl/make-contact.js')
-const contactMappingService = require('../src/services/database-services/contact-mapping-service');
+// Import the module that contains the function you want to test
+const makeContactController = require('../src/featureControl/make-contact')
 
-/* describe('makeNewContact', () => {
-  const req = {
-    body: {
-      payload: {
-        inboundFieldValues: {
-          itemMapping: {
-            name: 'John Doe',
-            primaryEmailID: 'john.doe@example.com',
-            workPhoneID: '1234567890',
-          },
-          itemId: 123,
-        },
+describe('makeContactController', () => {
+  it('should create a new contact if no mapping exists', async () => {
+    // Define test data
+    const req = {
+      body: {
+        payload: {
+          inboundFieldValues: {
+            itemMapping: {
+              name: 'John Doe',
+              email: 'testuser@example.com',
+              phone: '1234567890'
+            },
+            itemId: 123
+          }
+        }
+      }
+    }
+    const contactMappingServiceStub = {
+      getContactMapping: sinon.stub().returns(null)
+    }
+    const formatPhoneNumberStub = sinon.stub().returns('123-456-7890')
+    const nameSplitStub = sinon.stub().returns(['John', 'Doe'])
+    const createContactServiceStub = sinon.stub()
+    // Override modules with stubs
+    const stubs = {
+      '../../src/services/database-services/contact-mapping-service': contactMappingServiceStub,
+      '../../src/utils/formatPhoneNumber.js': {
+        formatPhoneNumber: formatPhoneNumberStub
       },
-    },
-  };
-
-  const res = {
-    status: sinon.stub().returns({
-      send: sinon.stub(),
-    }),
-  };
-
-  beforeEach(() => {
-    sinon.stub(contactMappingService, 'getContactMapping');
-    sinon.stub(contactMappingService, 'createContactMapping');
-  });
-
-  afterEach(() => {
-    sinon.restore();
-  });
-
-  it('should create a new contact if itemMapping does not exist', async () => {
-    contactMappingService.getContactMapping.resolves(null);
-    sinon.stub(module.exports, 'makeContact').resolves(0);
-
-    await makeNewContact(req, res);
-
-    expect(contactMappingService.getContactMapping.calledOnce).to.be.true;
-    expect(module.exports.makeContact.calledOnce).to.be.true;
-    expect(res.status.calledOnceWithExactly(200)).to.be.true;
-  });
-
-  it('should return 200 if itemMapping exists', async () => {
-    contactMappingService.getContactMapping.resolves({});
-
-    await makeNewContact(req, res);
-
-    expect(contactMappingService.getContactMapping.calledOnce).to.be.true;
-    expect(module.exports.makeContact.called).to.be.false;
-    expect(res.status.calledOnceWithExactly(200)).to.be.true;
-  });
-
-  it('should return 500 if an error occurs', async () => {
-    contactMappingService.getContactMapping.rejects(new Error());
-
-    await makeNewContact(req, res);
-
-    expect(contactMappingService.getContactMapping.calledOnce).to.be.true;
-    expect(module.exports.makeContact.called).to.be.false;
-    expect(res.status.calledOnceWithExactly(500)).to.be.true;
-  });
-}); */
+      '../../src/utils/nameSplit.js': {
+        nameSplit: nameSplitStub
+      },
+      '../../src/services/google-services/create-service': {
+        createContactService: createContactServiceStub
+      }
+    }
+    const makeContactController = proxyquire('../src/featureControl/make-contact', stubs)
+    // Create mock response object
+    const res = {
+      status: sinon.stub().returnsThis(),
+      send: sinon.stub().returns()
+    }
+    // Call controller function
+    await makeContactController.makeNewContact(req, res)
+    console.log(res);
+    // Assert
+    expect(contactMappingServiceStub.getContactMapping.calledOnceWithExactly('123')).to.be.true
+    expect(nameSplitStub.calledOnceWithExactly('John Doe')).to.be.true
+    expect(formatPhoneNumberStub.calledOnceWithExactly('1234567890')).to.be.true
+    expect(createContactServiceStub.calledOnceWithExactly('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined)).to.be.true
+    expect(res.status.calledOnceWithExactly(200)).to.be.true
+    expect(res.send.calledOnce).to.be.true
+  })
+})

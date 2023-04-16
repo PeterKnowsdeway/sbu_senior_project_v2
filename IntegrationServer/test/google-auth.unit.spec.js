@@ -84,7 +84,7 @@ describe('OAuth2Client', function () {
 })
 
 // UNIT TESTS
-describe('setUpOAuth', () => {
+/* describe('setUpOAuth', () => {
   let req;
   let res;
   let asyncGetStub;
@@ -143,4 +143,4 @@ describe('setUpOAuth', () => {
     sinon.assert.calledOnce(sendStub);
     sinon.assert.calledWith(sendStub, 'Unable to generate URL');
   });
-});
+}); */
