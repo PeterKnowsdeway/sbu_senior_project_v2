@@ -8,6 +8,8 @@ const contactMappingService = require('../services/database-services/contact-map
 
 const { configVariables } = require('../config/config-helper.js')
 
+const { formatPhoneNumber } = require('../middleware/formatPhoneNumber.js');
+
 async function makeNewContact (req, res) {
   try {
     // gets the contact info from monday.com
@@ -53,16 +55,6 @@ async function nameSplit (name) {
   return nameArr
 }
 
-async function phoneFormat (phone) {
-  // Try to format mobile and work phones
-  if (phone !== undefined) {
-    console.log(phone)
-    if (phone.length === 10) {
-      phone = await '1 (' + phone.slice(0, 3) + ') ' + phone.substring(3, 6) + '-' + phone.substring(6, 10)
-    }
-  }
-}
-
 async function makeContact (itemID, itemMap) {
   // Get name and the IDs of the Title Fields that exist from contactMappingService
   const {
@@ -77,8 +69,8 @@ async function makeContact (itemID, itemMap) {
   const secondaryEmail = itemMap[secondaryEmailID]
   const notes = itemMap[notesID]
   const nameArr = await nameSplit(name)
-  const workPhone = await phoneFormat(itemMap[workPhoneID])
-  const mobilePhone = await phoneFormat(itemMap[mobilePhoneID])
+  const workPhone = await formatPhoneNumber(itemMap[workPhoneID])
+  const mobilePhone = await formatPhoneNumber(itemMap[mobilePhoneID])
 
   // calls the people api to create a contact with any information that has been put into the new contact.
   // Normally should just be the name

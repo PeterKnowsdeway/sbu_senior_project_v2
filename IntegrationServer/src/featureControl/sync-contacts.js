@@ -15,6 +15,8 @@ const fs = require('fs')
 const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
 
+const { formatPhoneNumber } = require('../middleware/formatPhoneNumber.js');
+
 const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist, in which case it will be created later
 
 // NOTE:
@@ -320,10 +322,10 @@ function parseColumnValues (currentItem, configVariables) {
         arrEmails.push({ value: currentColumn.text, type: 'other', formattedType: 'Other' })
         break
       case configVariables.workPhoneId:
-        arrPhoneNumber.push({ value: formatPhoneNumber(currentColumn.text), type: 'work', formattedType: 'Work' })
+        arrPhoneNumber.push({ value: await formatPhoneNumber(currentColumn.text), type: 'work', formattedType: 'Work' })
         break
       case configVariables.mobilePhoneID:
-        arrPhoneNumber.push({ value: formatPhoneNumber(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
+        arrPhoneNumber.push({ value: await formatPhoneNumber(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
         break
       case configVariables.notesID:
         arrNotes.push({ value: currentColumn.text, contentType: 'TEXT_PLAIN' })
@@ -342,14 +344,6 @@ function parseColumnValues (currentItem, configVariables) {
   }
 }
 
-
-function formatPhoneNumber (number) {
-  if (number.length === 10) {
-    return `1 (${number.slice(0, 3)}) ${number.substring(3, 6)}-${number.substring(6, 10)}`
-  } else {
-    return number
-  }
-}
 
 /**
  * This function will wait for a specified amount of time before continuing with the next line of code.
