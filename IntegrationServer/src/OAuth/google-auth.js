@@ -1,12 +1,8 @@
 const { google } = require('googleapis');
 const fs = require('fs');
-const readline = require('readline');
 const express = require('express');
 const router = express.Router();
-const redis = require('redis');
-const client = redis.createClient();
-
-console.log('I made it to google-oauth.js');
+const { client, asyncGet, asyncDel } = require('../middleware/redis.js');
 
 let { configVariables } = require('../config/config-helper.js');
 
@@ -29,75 +25,63 @@ google.options({ auth: OAuth2Client });
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
 async function setUpOAuth(req, res) {
-  console.log('I made it to setUpOauth.js');
   const TOKEN_PATH = './token.json';
-  fs.promises
-    .access(TOKEN_PATH, fs.constants.F_OK)
-    .then(() => {
-      fs.promises
-        .readFile(TOKEN_PATH)
-        .then((token) => {
-          OAuth2Client.credentials = JSON.parse(token);
-          const returnUrl = req.session.backToUrl;
-          return res.redirect(returnUrl);
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).send();
-        });
-    })
-    .catch(() => {
-      client.set('returnURl', req.session.backToUrl);
-      try {
-        const url = OAuth2Client.generateAuthUrl({
-          access_type: 'offline',
-          scope: SCOPES,
-        });
-        return res.redirect(url);
-      } catch (err) {
-        console.error('The URL could not be generated', err);
-        return res.status(500).send();
-      }
-    });
+  try {
+    const token = await asyncGet(TOKEN_PATH);
+    OAuth2Client.credentials = JSON.parse(token);
+    const returnUrl = req.session.backToUrl;
+    return res.redirect(returnUrl);
+  } catch (err) {
+    console.error(err);
+    client.set('returnURl', req.session.backToUrl);
+    try {
+      const url = OAuth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPES,
+      });
+      return res.redirect(url);
+    } catch (err) {
+      console.error('The URL could not be generated', err);
+      return res.status(500).send(err.message);
+    }
+  }
 }
 
 async function codeHandle(req, res) {
-  //Creates a new token or detects if a token already exists
-  console.log('I made it to token-store-permissions.js');
-  client.get('returnURl', (err, backToUrl) => {
-    if (backToUrl == undefined) {
-      return res.status(200).send({});
+  try {
+    const backToUrl = await asyncGet('returnURl');
+    if (!backToUrl) {
+      return res.status(400).send('backToUrl is not set');
     } else {
-      client.del('returnURl');
+      await asyncDel('returnURl');
       const TOKEN_PATH = './token.json';
-      fs.promises
-        .access(TOKEN_PATH, fs.constants.F_OK)
-        .then(() => {
-          fs.readFile(TOKEN_PATH, (err, token) => {
-            if (err) return console.error(err);
-            OAuth2Client.credentials = JSON.parse(token);
-            return res.redirect(backToUrl);
-          });
-        })
-        .catch(() => {
-          const code = req.query['code'];
-          console.log(code);
-          OAuth2Client.getToken(code, (err, token) => {
-            if (err)
-              return console.error('Error retrieving access token', err);
-            OAuth2Client.credentials = token;
-            console.log(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-              if (err) return console.error(err);
-              console.log('Token stored to', TOKEN_PATH);
-            });
-          });
+      try {
+        await fs.promises.access(TOKEN_PATH, fs.constants.F_OK);
+        const token = await fs.promises.readFile(TOKEN_PATH);
+        OAuth2Client.credentials = JSON.parse(token);
+        return res.redirect(backToUrl);
+      } catch (err) {
+        const code = req.query['code'];
+        console.log(code);
+        try {
+          const { tokens } = await OAuth2Client.getToken(code);
+          OAuth2Client.credentials = tokens;
+          console.log(tokens);
+          await fs.promises.writeFile(TOKEN_PATH, JSON.stringify(tokens));
+          console.log('Token stored to', TOKEN_PATH);
           return res.redirect(backToUrl);
-        });
+        } catch (err) {
+          console.error('Error getting token:', err.message);
+          return res.status(500).send();
+        }
+      }
     }
-  });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
 }
-
+  
 module.exports = {
   codeHandle,
   setUpOAuth,

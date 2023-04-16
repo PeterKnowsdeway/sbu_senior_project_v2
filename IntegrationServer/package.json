@@ -40,7 +40,8 @@
 		"sinon-chai": "^3.7.0",
 		"sqlite3": "^5.0.4",
 		"supertest": "^6.3.3",
-		"tmp": "^0.2.1"
+		"tmp": "^0.2.1",
+		"util": "^0.12.5"
 	},
 	"devDependencies": {
 		"chai": "^4.3.7",
