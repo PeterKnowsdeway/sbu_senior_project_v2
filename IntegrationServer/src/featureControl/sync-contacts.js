@@ -17,6 +17,8 @@ const setConfigVariables = require('../config/config-helper.js').setConfigVariab
 
 const { formatPhoneNumber } = require('../middleware/formatPhoneNumber.js');
 
+const { nameSplit } = require('../middleware/nameSplit.js');
+
 const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist, in which case it will be created later
 
 // NOTE:
@@ -93,7 +95,7 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
 
     const currentItem = boardItems[boardItemIndex]
     const name = currentItem.name
-    const arrName = name.split(' ', 2)
+    const nameArr = await nameSplit(name)
 
     const { arrEmails, arrPhoneNumber, arrNotes, itemID } = parseColumnValues(currentItem, configVariables)
     await service.people.createContact({
@@ -101,8 +103,10 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
         names: [
           {
             displayName: name,
-            familyName: arrName[1],
-            givenName: arrName[0]
+            givenName: nameArr[0],
+            middleName: nameArr[1],
+            familyName: nameArr[2],
+
           }
         ],
         emailAddresses: arrEmails,
@@ -110,8 +114,9 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
         biographies: arrNotes
       }
     }, async (err, res) => {
-      if (err) console.error('The API returned an error: ' + err)
-      else {
+      if (err) {
+        console.error('The API returned an error: ' + err)
+      } else {
         await contactMappingService.createContactMapping({
           itemID,
           resourceName: res.data.resourceName,
@@ -130,7 +135,7 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
  * @param boardItems - An array of objects that contain the data from the board.
  * @returns null.
  */
-async function syncWithExistingContacts (boardItems) { // updates existing database.
+async function syncWithExistingContacts (boardItems) { // updates new and existing database.
   console.log('I made it to syncExistingContatcs')
   let boardItemIndex = 0
 
@@ -139,8 +144,9 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
       await sleep(20000)
     }
 
-    const currentItem = boardItems[boardItemIndex]; const name = currentItem.name
-    const arrName = name.split(' ', 2)
+    const currentItem = boardItems[boardItemIndex];
+    const name = currentItem.name
+    const nameArr = await nameSplit(name)
 
     const { arrEmails, arrPhoneNumber, arrNotes, itemID } = parseColumnValues(currentItem, configVariables)
     let itemMapping = await contactMappingService.getContactMapping(itemID)
@@ -151,8 +157,9 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
           names: [
             {
               displayName: name,
-              familyName: arrName[1],
-              givenName: arrName[0]
+              givenName: nameArr[0],
+              middleName: nameArr[1],
+              familyName: nameArr[2],
             }
           ],
           emailAddresses: arrEmails,
@@ -176,8 +183,7 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
       }, async (err, res) => {
         if (err) return console.error('The API returned an error: ' + err)
         else {
-          await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
-          const updatedMapping = itemMapping = await contactMappingService.getContactMapping(itemID)
+          let updatedMapping = await contactMappingService.getContactMapping(itemID)
 
           await service.people.updateContact({
             resourceName: updatedMapping.dataValues.resourceName,
@@ -187,8 +193,10 @@ async function syncWithExistingContacts (boardItems) { // updates existing datab
               etag: updatedMapping.dataValues.etag,
               names: [
                 {
-                  givenName: arrName[0],
-                  familyName: arrName[1]
+                  displayName: name,
+                  givenName: nameArr[0],
+                  middleName: nameArr[1],
+                  familyName: nameArr[2],
                 }
               ],
               emailAddresses: arrEmails,
@@ -322,10 +330,10 @@ function parseColumnValues (currentItem, configVariables) {
         arrEmails.push({ value: currentColumn.text, type: 'other', formattedType: 'Other' })
         break
       case configVariables.workPhoneId:
-        arrPhoneNumber.push({ value: await formatPhoneNumber(currentColumn.text), type: 'work', formattedType: 'Work' })
+        arrPhoneNumber.push({ value: formatPhoneNumber(currentColumn.text), type: 'work', formattedType: 'Work' })
         break
       case configVariables.mobilePhoneID:
-        arrPhoneNumber.push({ value: await formatPhoneNumber(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
+        arrPhoneNumber.push({ value: formatPhoneNumber(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
         break
       case configVariables.notesID:
         arrNotes.push({ value: currentColumn.text, contentType: 'TEXT_PLAIN' })
