@@ -7,7 +7,7 @@ const service = google.people({ version: 'v1', auth: OAuth2Client })
 
 const contactMappingService = require('../database-services/contact-mapping-service')
 
-async function createContact(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID) {
+async function createContactService(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID, resourceName, etag) {
   await service.people.createContact({
     requestBody: {
       names: [
@@ -34,7 +34,7 @@ async function createContact(name, nameArr, arrEmails, arrPhoneNumber, arrNotes,
   })
 }
 
-async function updateContact (itemID, name, nameArr, arrEmails, arrPhoneNumber, arrNotes) {
+async function updateContactService (itemID, name, nameArr, arrEmails, arrPhoneNumber, arrNotes, resourceName, etag) {
   
   let updatedMapping = await contactMappingService.getContactMapping(itemID)
 
@@ -66,6 +66,6 @@ async function updateContact (itemID, name, nameArr, arrEmails, arrPhoneNumber, 
 
 
 module.exports = {
-  createContact,
-  updateContact
+  createContactService,
+  updateContactService
 }

@@ -28,13 +28,13 @@ describe('index route', function() {
   it('should return a 200 response for the /tokenHandle route', function(done) {
     request(app)
       .get('/tokenHandle')
-      .expect(500, done);
+      .expect(400, done);
   });
 
   it('should return a JSON response for /tokenHandle route', function(done) {
     request(app)
       .get('/tokenHandle')
-      .expect('Content-Type', "Content-Type")
+      .expect('Content-Type', "text/html; charset=utf-8")
       .end(function(err, res) {
         if (err) return done(err);
         expect(res.body).to.be.an('object');

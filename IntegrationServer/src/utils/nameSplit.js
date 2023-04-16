@@ -2,23 +2,20 @@
 /// /FUNCTIONS////
 // Rudimentary splitter for names using spaces - missing case for more than 3 spaces.
 
-async function nameSplit (name) {
-  const nameArr = await name.split(' ')
+async function nameSplit(name) {
+  const nameParts = name.trim().split(/\s+/); // Split on one or more whitespace characters
 
-  // If there is no middle, the last name needs to be assigned to nameArr[2] for the api call
-  switch (nameArr.length === 2) {
-    case 1 :
-      nameArr[1] = ''
-      nameArr[2] = ''
-      break
-    case 2 :
-      nameArr[2] = nameArr[1]
-      nameArr[1] = ''
-      break
-    case 3 :
-      break
+  // Limit the name to at most three parts
+  if (nameParts.length > 3) {
+    nameParts.splice(3);
   }
-  return nameArr
+
+  // If there is no middle name, shift the last name to the middle name position
+  if (nameParts.length === 2) {
+    nameParts.splice(1, 0, '');
+  }
+
+  return nameParts;
 }
 
 module.exports = nameSplit

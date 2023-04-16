@@ -10,6 +10,7 @@ const { configVariables } = require('../config/config-helper.js')
 
 const { formatPhoneNumber } = require('../utils/formatPhoneNumber.js');
 const { nameSplit } = require('../utils/nameSplit.js');
+const { createContactService } = require('../services/google-services/create-service')
 
 async function makeNewContact (req, res) {
   try {
@@ -52,50 +53,7 @@ async function makeContact (itemID, itemMap) {
   const workPhone = await formatPhoneNumber(itemMap[workPhoneID])
   const mobilePhone = await formatPhoneNumber(itemMap[mobilePhoneID])
 
-  // calls the people api to create a contact with any information that has been put into the new contact.
-  // Normally should just be the name
-  await service.people.createContact({
-    requestBody: { // info to push to Google as new contact
-      names: [{
-        displayName: name,
-        familyName: nameArr[2],
-        givenName: nameArr[0],
-        middleName: nameArr[1]
-      }],
-      emailAddresses: [{
-        value: primaryEmail,
-        type: 'work',
-        formattedType: 'Work'
-      }, {
-        value: secondaryEmail,
-        type: 'other',
-        formattedType: 'Other'
-      }],
-      phoneNumbers: [{
-        value: workPhone,
-        type: 'work',
-        formattedType: 'Work'
-      }, {
-        value: mobilePhone,
-        type: 'mobile',
-        formattedType: 'Mobile'
-      }],
-      biographies: [{
-        value: notes,
-        contentType: 'TEXT_PLAIN'
-      }]
-    } // end request body
-  }, async (err, res) => {
-    if (err) {
-      return console.error('The API returned an error: ' + err)
-    }
-    // Create internal contact mapping for database
-    await contactMappingService.createContactMapping({
-      itemID,
-      resourceName: res.data.resourceName,
-      etag: res.data.etag
-    })
-  })
+  await createContactService(name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes, resourceName, etag);
   return 0
 }
 

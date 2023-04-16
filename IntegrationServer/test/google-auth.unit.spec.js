@@ -14,6 +14,7 @@ chai.use(chaiSinon)
 
 const { setUpOAuth } = require('../src/OAuth/google-auth.js')
 const { codeHandle } = require('../src/OAuth/google-auth.js')
+const { asyncGet } = require('../src/middleware/redis');
 
 // Integration Tests?
 describe('OAuth2Client', function () {
@@ -83,86 +84,63 @@ describe('OAuth2Client', function () {
 })
 
 // UNIT TESTS
-/* describe('Google OAuth', () => {
-  describe('setUpOAuth', () => {
-    let req, res, generateAuthUrlStub, readFileStub, accessStub, setStub;
+describe('setUpOAuth', () => {
+  let req;
+  let res;
+  let asyncGetStub;
+  let redirectStub;
+  let generateAuthUrlStub;
 
-    beforeEach(() => {
-      req = {
-        session: {
-          backToUrl: 'http://example.com'
-        }
-      };
-
-      res = {
-        redirect: sinon.stub(),
-        status: sinon.stub().returns({
-          send: sinon.stub()
-        })
-      };
-
-      const oauth = new OAuth2Client();
-      generateAuthUrlStub = sinon.stub(oauth, 'generateAuthUrl');;
-      readFileStub = sinon.stub(fs.promises, 'readFile');
-      accessStub = sinon.stub(fs.promises, 'access');
-      setStub = sinon.stub(client, 'set');
-    });
-
-    afterEach(() => {
-      sinon.restore();
-    });
-
-    it('should redirect to the return URL when the token file exists', async () => {
-      accessStub.resolves();
-      readFileStub.resolves('{"access_token": "access_token", "refresh_token": "refresh_token", "scope": "https://www.googleapis.com/auth/contacts", "token_type": "Bearer", "expiry_date": 1649999349001}');
-
-      await setUpOAuth(req, res);
-
-      sinon.assert.calledOnce(accessStub);
-      sinon.assert.calledOnce(readFileStub);
-      sinon.assert.notCalled(generateAuthUrlStub);
-      sinon.assert.calledOnce(res.redirect);
-      sinon.assert.calledWith(res.redirect, 'http://example.com');
-    });
-
-
-    it('should redirect to the Google OAuth page when the token file does not exist', async () => {
-      accessStub.rejects();
-      generateAuthUrlStub.returns('https://accounts.google.com');
-
-      await setUpOAuth(req, res);
-
-      sinon.assert.calledOnce(accessStub);
-      sinon.assert.calledOnce(generateAuthUrlStub);
-      sinon.assert.calledOnce(setStub);
-      sinon.assert.calledOnce(res.redirect);
-      sinon.assert.calledWith(res.redirect, 'https://accounts.google.com');
-    });
-
-    it('should handle errors when the token file cannot be read', async () => {
-      accessStub.resolves();
-      readFileStub.rejects();
-
-      await setUpOAuth(req, res);
-
-      sinon.assert.calledOnce(accessStub);
-      sinon.assert.calledOnce(readFileStub);
-      sinon.assert.calledOnce(res.status);
-      sinon.assert.calledWith(res.status, 500);
-    });
-
-    it('should handle errors when the return URL cannot be saved to Redis', async () => {
-      accessStub.rejects();
-      generateAuthUrlStub.returns('https://accounts.google.com');
-      setStub.callsArgWith(2, new Error());
-
-      await setUpOAuth(req, res);
-
-      sinon.assert.calledOnce(accessStub);
-      sinon.assert.calledOnce(generateAuthUrlStub);
-      sinon.assert.calledOnce(setStub);
-      sinon.assert.calledOnce(res.status);
-      sinon.assert.calledWith(res.status, 500);
-    });
+  beforeEach(() => {
+    req = {
+      session: {
+        backToUrl: 'http://localhost:3000/auth'
+      }
+    };
+    res = {
+      redirect: sinon.stub(),
+      send: sinon.stub(),
+    };
+    asyncGetStub = sinon.stub(asyncGet, 'bind');
+    generateAuthUrlStub = sinon.stub(OAuth2Client.prototype, 'generateAuthUrl');
   });
-}); */
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should redirect to returnUrl if token exists', async () => {
+    const credentials = { access_token: '1234' };
+    const token = JSON.stringify(credentials);
+    asyncGetStub.withArgs('./token.json').resolves(token);
+    await setUpOAuth(req, res);
+    sinon.assert.calledOnce(res.redirect);
+    sinon.assert.calledWith(res.redirect, 'http://localhost:3000/auth');
+  });
+
+  it('should redirect to Google OAuth2 page if token does not exist', async () => {
+    asyncGetStub.withArgs('./token.json').rejects(new Error('Token not found'));
+    generateAuthUrlStub.returns('http://google.com/auth');
+    await setUpOAuth(req, res);
+    sinon.assert.calledOnce(generateAuthUrlStub);
+    sinon.assert.calledWith(generateAuthUrlStub, {
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/contacts'],
+      redirect_uri: 'http://localhost:3000/tokenHandle',
+    });
+    sinon.assert.calledOnce(res.redirect);
+    sinon.assert.calledWith(res.redirect, 'http://google.com/auth');
+  });
+
+  it('should return 500 status if URL cannot be generated', async () => {
+    asyncGetStub.withArgs('./token.json').rejects(new Error('Token not found'));
+    generateAuthUrlStub.throws(new Error('Unable to generate URL'));
+    const statusStub = sinon.stub(res, 'status').returns(res);
+    const sendStub = sinon.stub(res, 'send').returns(res);
+    await setUpOAuth(req, res);
+    sinon.assert.calledOnce(statusStub);
+    sinon.assert.calledWith(statusStub, 500);
+    sinon.assert.calledOnce(sendStub);
+    sinon.assert.calledWith(sendStub, 'Unable to generate URL');
+  });
+});

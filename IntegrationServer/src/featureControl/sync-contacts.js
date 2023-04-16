@@ -129,7 +129,7 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
     let itemMapping = await contactMappingService.getContactMapping(itemID)
 
     if (itemMapping == null) {
-      await createContactService(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID)
+      await createContactService(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID, resourceName, etag)
     } else {
       service.people.get({
         resourceName: itemMapping.dataValues.resourceName,
@@ -137,7 +137,7 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
       }, async (err, res) => {
         if (err) return console.error('The API returned an error: ' + err)
         else {
-          await updateConatctService(itemID, name, nameArr, arrEmails, arrPhoneNumber, arrNotes)
+          await updateConatctService(itemID, name, nameArr, arrEmails, arrPhoneNumber, arrNotes, resourceName, etag)
         }
       })
     }
