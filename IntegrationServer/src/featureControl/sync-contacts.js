@@ -2,6 +2,7 @@ const { google } = require('googleapis')
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 const Mutex = require('async-mutex').Mutex
 const populateLock = new Mutex()
+const fs = require('fs')
 google.options({ auth: OAuth2Client })
 
 const service = google.people({ version: 'v1', auth: OAuth2Client })
@@ -9,15 +10,16 @@ const service = google.people({ version: 'v1', auth: OAuth2Client })
 const contactMappingService = require('../services/database-services/contact-mapping-service')
 
 const { getBoardItems } = require('../services/monday-service.js')
-const fs = require('fs')
 
 /* Import the configVariables from the config-helper.js file. */
 const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
 
-const { formatPhoneNumber } = require('../middleware/formatPhoneNumber.js');
+const { formatPhoneNumber } = require('../utils/formatPhoneNumber.js');
 
-const { nameSplit } = require('../middleware/nameSplit.js');
+const { nameSplit } = require('../utils/nameSplit.js');
+
+const { createContactService, updateContactService } = require('../services/google-services/sync-service')
 
 const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist, in which case it will be created later
 
@@ -98,32 +100,7 @@ async function initalSetupGoogleContacts (boardItems) { // makes new database.
     const nameArr = await nameSplit(name)
 
     const { arrEmails, arrPhoneNumber, arrNotes, itemID } = parseColumnValues(currentItem, configVariables)
-    await service.people.createContact({
-      requestBody: {
-        names: [
-          {
-            displayName: name,
-            givenName: nameArr[0],
-            middleName: nameArr[1],
-            familyName: nameArr[2],
-
-          }
-        ],
-        emailAddresses: arrEmails,
-        phoneNumbers: arrPhoneNumber,
-        biographies: arrNotes
-      }
-    }, async (err, res) => {
-      if (err) {
-        console.error('The API returned an error: ' + err)
-      } else {
-        await contactMappingService.createContactMapping({
-          itemID,
-          resourceName: res.data.resourceName,
-          etag: res.data.etag
-        })
-      }
-    })
+    await createContactService(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID)
     boardItemIndex++
   }
   return null
@@ -152,30 +129,7 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
     let itemMapping = await contactMappingService.getContactMapping(itemID)
 
     if (itemMapping == null) {
-      await service.people.createContact({
-        requestBody: {
-          names: [
-            {
-              displayName: name,
-              givenName: nameArr[0],
-              middleName: nameArr[1],
-              familyName: nameArr[2],
-            }
-          ],
-          emailAddresses: arrEmails,
-          phoneNumbers: arrPhoneNumber,
-          biographies: arrNotes
-        }
-      }, async (err, res) => {
-        if (err) console.error('The API returned an error: hi' + err)
-        else {
-          await contactMappingService.createContactMapping({
-            itemID,
-            resourceName: res.data.resourceName,
-            etag: res.data.etag
-          })
-        }
-      })
+      await createContactService(name, nameArr, arrEmails, arrPhoneNumber, arrNotes, itemID)
     } else {
       service.people.get({
         resourceName: itemMapping.dataValues.resourceName,
@@ -183,32 +137,7 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
       }, async (err, res) => {
         if (err) return console.error('The API returned an error: ' + err)
         else {
-          let updatedMapping = await contactMappingService.getContactMapping(itemID)
-
-          await service.people.updateContact({
-            resourceName: updatedMapping.dataValues.resourceName,
-            sources: 'READ_SOURCE_TYPE_CONTACT',
-            updatePersonFields: 'biographies,emailAddresses,names,phoneNumbers',
-            requestBody: {
-              etag: updatedMapping.dataValues.etag,
-              names: [
-                {
-                  displayName: name,
-                  givenName: nameArr[0],
-                  middleName: nameArr[1],
-                  familyName: nameArr[2],
-                }
-              ],
-              emailAddresses: arrEmails,
-              phoneNumbers: arrPhoneNumber,
-              biographies: arrNotes
-            }
-          }, async (err, res) => {
-            if (err) console.error('The API returned an error: ' + err)
-            else {
-              await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
-            }
-          })
+          await updateConatctService(itemID, name, nameArr, arrEmails, arrPhoneNumber, arrNotes)
         }
       })
     }

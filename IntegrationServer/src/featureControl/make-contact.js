@@ -8,8 +8,8 @@ const contactMappingService = require('../services/database-services/contact-map
 
 const { configVariables } = require('../config/config-helper.js')
 
-const { formatPhoneNumber } = require('../middleware/formatPhoneNumber.js');
-const { nameSplit } = require('../middleware/nameSplit.js');
+const { formatPhoneNumber } = require('../utils/formatPhoneNumber.js');
+const { nameSplit } = require('../utils/nameSplit.js');
 
 async function makeNewContact (req, res) {
   try {
