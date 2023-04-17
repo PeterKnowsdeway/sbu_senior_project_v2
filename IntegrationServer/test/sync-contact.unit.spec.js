@@ -5,6 +5,24 @@ const { fetchContacts } = require('../src/featureControl/sync-contacts.js');
 
 chai.use(chaiHttp);
 
+/* TODO:
+
+Test the getBoardItems() function to ensure that it retrieves the correct board items from Monday.com.
+
+Test the getContactMappingByResourceName() function to ensure that it returns the correct contact mapping for a given resource name.
+
+Test the createContactService() function to ensure that it creates a new contact correctly.
+
+Test the updateContactService() function to ensure that it updates an existing contact correctly.
+
+Test the updateContacts() function to ensure that it updates each contact correctly.
+
+Test the populate() function to ensure that it correctly synchronizes contacts between Monday.com and Google Contacts.
+
+Test the error handling in various functions to ensure that any errors are handled appropriately and a 500 response is returned.
+
+*/
+
 /* describe('fetchContacts', function () {
   it('should return 200 status code and an empty object', function (done) {
     const req = {

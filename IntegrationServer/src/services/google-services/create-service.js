@@ -9,7 +9,7 @@ const contactMappingService = require('../database-services/contact-mapping-serv
 
  // calls the people api to create a contact with any information that has been put into the new contact.
 // Normally should just be the name
-async function createContactService(name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes, resourceName, etag) {
+async function createContactService(name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes) {
   await service.people.createContact(
     {
       requestBody: {
@@ -66,4 +66,8 @@ async function createContactService(name, nameArr, primaryEmail, secondaryEmail,
       })
     }
   )
+}
+
+module.exports = {
+  createContactService
 }

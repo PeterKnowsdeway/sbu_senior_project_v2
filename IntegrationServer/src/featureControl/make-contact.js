@@ -53,7 +53,7 @@ async function makeContact (itemID, itemMap) {
   const workPhone = await formatPhoneNumber(itemMap[workPhoneID])
   const mobilePhone = await formatPhoneNumber(itemMap[mobilePhoneID])
 
-  await createContactService(name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes, resourceName, etag);
+  await createContactService(name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes);
   return 0
 }
 
