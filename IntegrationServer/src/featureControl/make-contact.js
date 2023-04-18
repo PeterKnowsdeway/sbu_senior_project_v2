@@ -15,9 +15,8 @@ const contactMappingService = require('../services/database-services/contact-map
 
 const { configVariables } = require('../config/config-helper.js')
 
-const { formatPhoneNumber } = require('../utils/formatPhoneNumber.js');
-const { nameSplit } = require('../utils/nameSplit.js');
 const { createContactService } = require('../services/google-services/create-service')
+const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') //Information parser
 
 async function makeNewContact(req, res) {
   try {
@@ -46,69 +45,20 @@ async function makeNewContact(req, res) {
 };
 
 async function makeContact(itemID, itemMap) {
-  // Get name and the IDs of the Title Fields that exist from contactMappingService
-  const {
-    primaryEmailID,
-    secondaryEmailID,
-    workPhoneID,
-    mobilePhoneID,
-    notesID,
-  } = configVariables;
+
+  //Get info
   const name = itemMap.name;
   let nameArr = await nameSplit(name);
   let { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap, configVariables)
 
-  
-  await createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+  //Request Creation
+  try {
+    await createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+  } catch(error) {
+    return error
+  }
   
   return 0;
-}
-
-/*
-//WIP - No implemented.
-//Intended for in case functionality with createMappingService is split from the createContact case for readability reasons.
-async function newMapping(itemID, resourceName, etag) {
-  await contactMappingService.createContactMapping({
-    itemID,
-    resourceName: resourceName, 
-    etag: etag
-  });
-}
-*/
-
-async function formatColumnValues (itemMap) {
-  const {
-    primaryEmailID,
-    secondaryEmailID,
-    workPhoneID,
-    mobilePhoneID,
-    notesID,
-  } = configVariables;
-  let workPhone = await formatPhoneNumber(itemMap[workPhoneID]);
-  let mobilePhone = await formatPhoneNumber(itemMap[mobilePhoneID]);
-  const primaryEmail = itemMap[primaryEmailID];
-  const secondaryEmail = itemMap[secondaryEmailID];
-  const notes = itemMap[notesID];
-
-  let arrEmails= []
-  let arrPhoneNumbers=[]
-  let arrNotes = []
-
-  arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
-  arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
-  arrPhoneNumbers.push({ value: workPhone, type: 'work', formattedType: 'Work' })
-  arrPhoneNumbers.push({ value: mobilePhone, type: 'mobile', formattedType: 'Mobile' })
-  arrNotes.push({ value: notes, contentType: 'TEXT_PLAIN' })
-
-  console.log("Emails: ", arrEmails)
-  console.log("Phones: ", arrPhoneNumbers)
-  console.log("Notes: ", arrNotes)
-
-  return {
-    arrEmails,
-    arrPhoneNumbers,
-    arrNotes,
-  }
 }
 
 module.exports = {
