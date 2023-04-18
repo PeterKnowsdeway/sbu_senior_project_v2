@@ -1,3 +1,18 @@
+
+/*
+  This file contains functions that interact with the ContactMapping database.
+  ContactMapping is a Sequilize database that contains two columns:
+    - itemID (primary key)
+    - resourceName (string)
+    - etag (string)
+
+  The ContactMapping database is used to keep track of the etag values for each contact.
+  The etag value is used to determine whether or not a contact has been updated since the last time it was synced with HubSpot.
+  The etag value is also used to determine whether or not a contact is new to HubSpot.
+  If a contact is new to HubSpot, then the contact will be created in HubSpot.
+  If a contact has been updated since the last time it was synced with HubSpot, then the contact will be updated in HubSpot.
+*/
+
 const { ContactMapping } = require('../../db/models') // Imports command (which extends from sequilize's db Model?) from contactmapping.js (also see ContactMapping.init)
 
 // Takes an itemID as an argument, and returns the result of a query to the database.
@@ -13,7 +28,6 @@ const getContactMapping = async (itemID) => { // Database query to find item wit
 
 // Creates new entry within ContactMapping sequilize database to keep track of contacts.
 const createContactMapping = async (attributes) => {
-  console.log('I made it to createContactMapping.js')
   const { itemID, resourceName, etag } = attributes
   try {
     await ContactMapping.create({
@@ -29,7 +43,6 @@ const createContactMapping = async (attributes) => {
 
 // Updates an entry within ContactMapping sequilize database with new information
 const updateContactMapping = async (itemID, updates) => {
-  console.log('I made it to updateContactMapping')
   const { resourceName, etag } = updates
   try {
     const updatedContactMapping = await ContactMapping.update(
@@ -49,7 +62,6 @@ const updateContactMapping = async (itemID, updates) => {
 
 // Delete ALL data from database.
 const deleteDatabse = async () => {
-  console.log('I made it to deleteDatabase.')
   try {
     await ContactMapping.destroy( // Sequilize command with options set up to delete ALL data from ContactMapping
       {

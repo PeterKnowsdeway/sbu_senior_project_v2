@@ -1,10 +1,12 @@
+/**
+ * This file is used to authenticate requests that come from our Monday.com app.
+ * It uses the Monday.com signing secret to decrypt the request, and then stores
+ * the decrypted data to the session.
+ */
+
 const jswtoken = require('jsonwebtoken') // get the json webtoken library.
 
-// This function authenticates that the request that got sent from our Monday.com App. It uses the signing secrete and JWT to try and decript
-// some expected information in the request. If it succeeds, it stores some data to the session, and allows the request through, if it fails, the request
-// is stopped.
 async function authRequestMiddleware (req, res, next) {
-  console.log('I made it to authRequestMiddleWare.js')
   try {
     let authorization = req.headers.authorization // get the authentication info from the request.
     if (!authorization && req.query) {
@@ -29,3 +31,4 @@ async function authRequestMiddleware (req, res, next) {
 module.exports = {
   authRequestMiddleware
 }
+

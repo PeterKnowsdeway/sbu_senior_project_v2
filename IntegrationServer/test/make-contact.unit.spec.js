@@ -36,10 +36,16 @@ describe('makeContactController', () => {
       return '1 (' + phone.slice(0, 3) + ') ' + phone.slice(3, 6) + '-' + phone.slice(6, 10)
     })
     const nameSplitStub = sinon.stub().returns(['John', 'Doe'])
-    const createContactServiceStub = sinon.stub().callsFake(async (name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes,   callback) => {
+    // Define a callback function stub
+    const callbackStub = sinon.stub()
+    
+    const createContactServiceStub = sinon.stub().callsFake(async (name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes, callback) => {
+      console.log('callback function called with arguments:', name, nameArr, primaryEmail, secondaryEmail, workPhone, mobilePhone, notes, callback);
       const res = { data: { resourceName: 'resourceName', etag: 'etag' } } // define a dummy response
       await callback(null, res) // call the callback function to execute contactMappingService.createContactMapping
+      callbackStub(res) // call the callback function stub
     })
+
     // Override modules with stubs
     const stubs = {
       '../../src/services/database-services/contact-mapping-service': contactMappingServiceStub,
@@ -62,12 +68,14 @@ describe('makeContactController', () => {
     }
     // Call controller function
     await formatPhoneNumberStub('1234567890')
+    await createContactServiceStub('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined, callbackStub);
     await makeContactController.makeNewContact(req, res)
    
     // Assert
     expect(contactMappingServiceStub.getContactMapping.calledOnceWithExactly('123')).to.be.true
     expect(nameSplitStub.calledOnceWithExactly('John Doe')).to.be.true
     expect(await formatPhoneNumberStub.getCall(0).args[0]).to.equal('1234567890');
+    console.log(createContactServiceStub.args)
     expect(await createContactServiceStub.calledOnceWithExactly('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined)).to.be.true
     expect(res.status.calledOnceWithExactly(200)).to.be.true
     expect(res.send.calledOnce).to.be.true

@@ -19,7 +19,9 @@ const { formatPhoneNumber } = require('../utils/formatPhoneNumber.js');
 
 const { nameSplit } = require('../utils/nameSplit.js');
 
-const { createContactService, updateContactService } = require('../services/google-services/sync-service')
+const { createContactService } = require('../services/google-services/vreate-service')
+
+const { updateContactService } = require('../services/google-services/update-service')
 
 const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist, in which case it will be created later
 
@@ -224,7 +226,6 @@ function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
       }
 
       columnIdConfig.push(obj)
-      console.log(currentColumn.title + ' ' + currentColumn.id)
     }
   }
 

@@ -1,3 +1,19 @@
+/**
+ * This file contains the code for the file endpoint.
+ *
+ * The file endpoint is used to make, update, and sync contacts.
+ * It also contains a print endpoint which is used to test the queue.
+ *
+ * The file endpoint uses a queue to limit the number of requests that can be made at once.
+ * This is to prevent the server from being overloaded with requests.
+ *
+ * The queue is implemented using a FIFO queue.
+ *
+ * The queue has a timeout for the tasks in the queue.
+ * This is to prevent tasks from blocking the queue indefinitely.
+ *
+ */
+
 const express = require('express')
 const router = express.Router()
 const rateLimiterUsingThirdParty = require('../middleware/rateLimiter.js')
@@ -11,7 +27,7 @@ const Queue = require('queue-fifo')
 const queue = new Queue()
 
 // Set a timeout for tasks in the queue to prevent them from blocking the queue indefinitely
-const TIMEOUT = 10000 // 10 seconds
+const TIMEOUT = 50000 // 5 seconds
 
 router.use(rateLimiterUsingThirdParty)
 
@@ -85,3 +101,4 @@ router.post('/print', authenticationMiddleware, async (req, res) => {
 })
 
 module.exports = router
+

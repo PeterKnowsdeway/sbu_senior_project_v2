@@ -1,3 +1,8 @@
+/**
+ * This file contains the code that is used to set up the OAuth2 connection with Google.
+ * It is used to redirect the user to the Google OAuth2 page, and to handle the code that is returned.
+ */
+
 const { google } = require('googleapis');
 const fs = require('fs');
 const express = require('express');
@@ -81,11 +86,9 @@ async function codeHandle(req, res) {
     return res.status(500).send(err);
   }
 }
-  
+
 module.exports = {
   codeHandle,
   setUpOAuth,
   OAuthClient: OAuth2Client,
 };
-
-

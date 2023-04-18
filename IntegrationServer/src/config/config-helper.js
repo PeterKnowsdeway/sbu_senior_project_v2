@@ -1,7 +1,7 @@
 
 /* Creating a JSON object with the keys and values. */
 const configVariables = {
-  workPhoneId: '',
+  workPhoneID: '',
   mobilePhoneID: '',
   primaryEmailID: '',
   secondaryEmailID: '',
@@ -23,7 +23,7 @@ async function setConfigVariables (config) {
     switch (currentSection.title) {
       case process.env.WORK_PHONE_TITLE:
         console.log(currentSection.id)
-        configVariables.workPhoneId = currentSection.id
+        configVariables.workPhoneID = currentSection.id
         break
       case process.env.MOBILE_PHONE_TITLE:
         console.log(currentSection.id)

@@ -1,3 +1,7 @@
+/**
+ * This file contains the functions that are used to perform the queries to the Monday API.
+ */
+
 const initMondayClient = require('monday-sdk-js')
 
 /**
@@ -6,7 +10,6 @@ const initMondayClient = require('monday-sdk-js')
  * @param boardId - The ID of the board you want to get items from.
  * @returns An array containing the Board items queried
  */
-console.log('I made it to monday-service.js')
 const getBoardItems = async (token, boardId) => {
   try {
     const mondayClient = initMondayClient()
@@ -38,3 +41,4 @@ const getBoardItems = async (token, boardId) => {
 module.exports = {
   getBoardItems
 }
+

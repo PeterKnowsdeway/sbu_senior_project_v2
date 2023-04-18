@@ -1,3 +1,6 @@
+
+// This file is used to handle the routes for the OAuth flow.
+
 const express = require('express')
 const router = express.Router()
 const rateLimiterUsingThirdParty = require('../middleware/rateLimiter.js')
@@ -14,3 +17,4 @@ router.get('/auth', AuthenticationMiddleware, handleAuth)
 router.get('/tokenHandle', generateToken)
 
 module.exports = router
+

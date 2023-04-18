@@ -1,3 +1,9 @@
+/*
+ * This file is a wrapper around the Redis client.
+ * It provides a way to connect to Redis and to asynchronously get and delete data from Redis.
+ * It also provides a way to check if the Redis client is connected.
+ */
+
 const redis = require('redis');
 const { promisify } = require('util');
 
