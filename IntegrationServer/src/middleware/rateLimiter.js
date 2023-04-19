@@ -9,9 +9,9 @@ const rateLimiterUsingThirdParty = rateLimit({
   max: 100,
   message: 'You have exceeded the 100 requests in 24 hrs limit!',
   standardHeaders: true,
-  legacyHeaders: false,
-  //TODO: Implement this later
-  /*keyGenerator: function(req) {
+  legacyHeaders: false
+  // TODO: Implement this later
+  /* keyGenerator: function(req) {
     // Check if request is from a trusted IP address
     if (req.ip === '192.168.1.1') {
       return req.ip + '-trusted';

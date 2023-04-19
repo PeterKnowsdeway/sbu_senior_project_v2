@@ -13,10 +13,8 @@ const OAuthSetupRoute = require('./OAuth-helper')
 
 router.use(rateLimiterUsingThirdParty)
 
-console.log('I made it to index.js routes')
 // tells the router listen for requsts using the contacts-integration.js file.
 router.use(toContactsRoute)
 router.use(OAuthSetupRoute)
 
 module.exports = router
-

@@ -17,4 +17,3 @@ router.get('/auth', AuthenticationMiddleware, handleAuth)
 router.get('/tokenHandle', generateToken)
 
 module.exports = router
-

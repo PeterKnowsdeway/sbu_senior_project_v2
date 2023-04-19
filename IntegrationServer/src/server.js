@@ -10,7 +10,7 @@ const { setOAuthCredentials } = require('./startup-helper.js')
 const { loadConfigVariables } = require('./startup-helper.js')
 
 // require file to make it's code run upon startup.
-const { useAccesstoken } = require('./OAuth/token-store-periodic.js') // temporary access token refresher - schedules itself to run periodically when loaded, to keep the access token from expiring
+const { useAccessToken } = require('./OAuth/token-store-periodic.js') // temporary access token refresher - schedules itself to run periodically when loaded, to keep the access token from expiring
 schedule.scheduleJob('0 * * * *', useAccessToken) // Schedules useAccessToken to run every hour
 
 app.use(bodyParser.json()) // Have all requests filtered through bodyParser so that the body of all the POST requests sent to the API to be read and used.

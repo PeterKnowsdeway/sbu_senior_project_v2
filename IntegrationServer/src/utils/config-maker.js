@@ -2,8 +2,15 @@ const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist,
 const fs = require('fs')
 
 /* Import the configVariables from the config-helper.js file. */
-const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
+
+const validTitles = [
+    process.env.WORK_PHONE_TITLE,
+    process.env.MOBILE_PHONE_TITLE,
+    process.env.EMAIL_PRIMARY_TITLE,
+    process.env.EMAIL_SECONDARY_TITLE,
+    process.env.NOTES_TITLE
+  ]
 
 /**
  * Sets up config.json when config.json does not exist. Else it reads the values in config.json
@@ -16,7 +23,7 @@ async function initializeConfig (boardItems) {
     const currentItem = boardItems[0] // container for the current' columns IDs (see above)
 
     if (!(fs.existsSync(conf))) {
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger
+      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) // assume: at least one item in board. otherwise button should not exist to trigger
       const config = {
         columnIds: columnIdConfig,
         settings: {
@@ -52,13 +59,6 @@ async function initializeConfig (boardItems) {
 }
 
 function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
-  const validTitles = [
-    process.env.WORK_PHONE_TITLE,
-    process.env.MOBILE_PHONE_TITLE,
-    process.env.EMAIL_PRIMARY_TITLE,
-    process.env.EMAIL_SECONDARY_TITLE,
-    process.env.NOTES_TITLE
-  ]
 
   for (let i = 0; i < currentItem.column_values.length; i++) {
     const currentColumn = currentItem.column_values[i]

@@ -31,4 +31,3 @@ async function authRequestMiddleware (req, res, next) {
 module.exports = {
   authRequestMiddleware
 }
-

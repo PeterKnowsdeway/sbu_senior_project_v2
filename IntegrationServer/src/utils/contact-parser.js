@@ -1,28 +1,29 @@
 
-const { configVariables } = require('../config/config-helper.js');
+const { configVariables } = require('../config/config-helper.js')
 
-async function nameSplit(name) {
-  const nameParts = name.trim().split(/\s+/); // Split on one or more whitespace characters
+async function nameSplit (name) {
+  const nameParts = name.trim().split(/\s+/) // Split on one or more whitespace characters
 
   // Limit the name to at most three parts
   if (nameParts.length > 3) {
-    nameParts.splice(3);
+    nameParts.splice(3)
   }
 
   // If there is no middle name, shift the last name to the middle name position
   if (nameParts.length === 2) {
-    nameParts.splice(1, 0, '');
+    nameParts.splice(1, 0, '')
   }
 
-  return nameParts;
+  return nameParts
 }
 
-async function phoneformat (phone) {
+async function phoneFormat (phone) {
   // Try to format mobile and work phones
   if (phone !== undefined) {
     console.log(phone)
     if (phone.length === 10) {
-      return phone = await '1 (' + phone.slice(0, 3) + ') ' + phone.substring(3, 6) + '-' + phone.substring(6, 10)
+      phone = await '1 (' + phone.slice(0, 3) + ') ' + phone.substring(3, 6) + '-' + phone.substring(6, 10)
+      return phone
     }
   }
 }
@@ -33,18 +34,18 @@ async function formatColumnValues (itemMap) {
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID,
-  } = configVariables;
+    notesID
+  } = configVariables
 
-  let workPhone = await phoneFormat(itemMap[workPhoneID]);
-  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
-  const primaryEmail = itemMap[primaryEmailID];
-  const secondaryEmail = itemMap[secondaryEmailID];
-  const notes = itemMap[notesID];
+  const workPhone = await phoneFormat(itemMap[workPhoneID])
+  const mobilePhone = await phoneFormat(itemMap[mobilePhoneID])
+  const primaryEmail = itemMap[primaryEmailID]
+  const secondaryEmail = itemMap[secondaryEmailID]
+  const notes = itemMap[notesID]
 
-  let arrEmails= []
-  let arrPhoneNumbers=[]
-  let arrNotes = []
+  const arrEmails = []
+  const arrPhoneNumbers = []
+  const arrNotes = []
 
   arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
   arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
@@ -55,21 +56,21 @@ async function formatColumnValues (itemMap) {
   return {
     arrEmails,
     arrPhoneNumbers,
-    arrNotes,
+    arrNotes
   }
 }
 
-async function parseColumnValues(currentItem) { 
+async function parseColumnValues (currentItem) {
   const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID,
-  } = configVariables;
+    notesID
+  } = configVariables
 
   const arrEmails = []
-  const arrPhoneNumbers=[]
+  const arrPhoneNumbers = []
   const arrNotes = []
   let itemID = null
 
@@ -98,7 +99,7 @@ async function parseColumnValues(currentItem) {
     }
   }
 
-return { 
+  return {
     arrEmails,
     arrPhoneNumbers,
     arrNotes,
@@ -106,9 +107,9 @@ return {
   }
 }
 
-
 module.exports = {
   formatColumnValues,
   parseColumnValues,
-  nameSplit
+  nameSplit,
+  phoneFormat
 }

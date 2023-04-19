@@ -41,4 +41,3 @@ const getBoardItems = async (token, boardId) => {
 module.exports = {
   getBoardItems
 }
-
