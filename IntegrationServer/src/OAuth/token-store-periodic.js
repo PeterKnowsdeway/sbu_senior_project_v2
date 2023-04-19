@@ -19,15 +19,12 @@
   updated with the new access token.
 */
 
-const schedule = require('node-schedule')
 const fs = require('fs')
 const { google } = require('googleapis')
 
 const OAuth2Client = require('./google-auth.js').OAuthClient
 
 google.options({ auth: OAuth2Client })
-
-schedule.scheduleJob('0 * * * *', useAccessToken) // Schedules useAccessToken to run every ???
 
 function useAccessToken () {
   // Prevent integrations from running if no credentials are set

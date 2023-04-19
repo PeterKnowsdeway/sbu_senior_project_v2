@@ -17,7 +17,7 @@ async function nameSplit(name) {
   return nameParts;
 }
 
-async function formatPhoneNumber (phone) {
+async function phoneformat (phone) {
   // Try to format mobile and work phones
   if (phone !== undefined) {
     console.log(phone)
@@ -36,8 +36,8 @@ async function formatColumnValues (itemMap) {
     notesID,
   } = configVariables;
 
-  let workPhone = await formatPhoneNumber(itemMap[workPhoneID]);
-  let mobilePhone = await formatPhoneNumber(itemMap[mobilePhoneID]);
+  let workPhone = await phoneFormat(itemMap[workPhoneID]);
+  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
   const primaryEmail = itemMap[primaryEmailID];
   const secondaryEmail = itemMap[secondaryEmailID];
   const notes = itemMap[notesID];
@@ -59,8 +59,56 @@ async function formatColumnValues (itemMap) {
   }
 }
 
+async function parseColumnValues(currentItem) { 
+  const {
+    primaryEmailID,
+    secondaryEmailID,
+    workPhoneID,
+    mobilePhoneID,
+    notesID,
+  } = configVariables;
+
+  const arrEmails = []
+  const arrPhoneNumbers=[]
+  const arrNotes = []
+  let itemID = null
+
+  for (const currentColumn of currentItem.column_values) {
+    const columnId = currentColumn.id
+
+    switch (columnId) {
+      case primaryEmailID:
+        arrEmails.push({ value: currentColumn.text, type: 'work', formattedType: 'Work' })
+        break
+      case secondaryEmailID:
+        arrEmails.push({ value: currentColumn.text, type: 'other', formattedType: 'Other' })
+        break
+      case workPhoneID:
+        arrPhoneNumbers.push({ value: await phoneFormat(currentColumn.text), type: 'work', formattedType: 'Work' })
+        break
+      case mobilePhoneID:
+        arrPhoneNumbers.push({ value: await phoneFormat(currentColumn.text), type: 'mobile', formattedType: 'Mobile' })
+        break
+      case notesID:
+        arrNotes.push({ value: currentColumn.text, contentType: 'TEXT_PLAIN' })
+        break
+      case 'item_id':
+        itemID = currentColumn.text
+        break
+    }
+  }
+
+return { 
+    arrEmails,
+    arrPhoneNumbers,
+    arrNotes,
+    itemID
+  }
+}
+
+
 module.exports = {
   formatColumnValues,
-  nameSplit,
-  formatPhoneNumber
+  parseColumnValues,
+  nameSplit
 }

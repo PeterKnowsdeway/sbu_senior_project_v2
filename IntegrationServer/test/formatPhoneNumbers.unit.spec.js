@@ -1,8 +1,8 @@
 const chai = require('chai');
 const expect = chai.expect;
-const { formatPhoneNumber }  = require('../src/utils/contact-parser.js');
+const { phoneFormat }  = require('../src/utils/contact-parser.js');
 
-describe('formatPhoneNumber', () => {
+describe('phoneFormat', () => {
   it('should return undefined if input is undefined', async () => {
     const result = await formatPhoneNumber(undefined);
     expect(result).to.be.undefined;
