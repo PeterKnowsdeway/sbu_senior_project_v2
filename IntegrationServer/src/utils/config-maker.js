@@ -5,12 +5,12 @@ const fs = require('fs')
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
 
 const validTitles = [
-    process.env.WORK_PHONE_TITLE,
-    process.env.MOBILE_PHONE_TITLE,
-    process.env.EMAIL_PRIMARY_TITLE,
-    process.env.EMAIL_SECONDARY_TITLE,
-    process.env.NOTES_TITLE
-  ]
+  process.env.WORK_PHONE_TITLE,
+  process.env.MOBILE_PHONE_TITLE,
+  process.env.EMAIL_PRIMARY_TITLE,
+  process.env.EMAIL_SECONDARY_TITLE,
+  process.env.NOTES_TITLE
+]
 
 /**
  * Sets up config.json when config.json does not exist. Else it reads the values in config.json
@@ -59,7 +59,6 @@ async function initializeConfig (boardItems) {
 }
 
 function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
-
   for (let i = 0; i < currentItem.column_values.length; i++) {
     const currentColumn = currentItem.column_values[i]
     const columnId = currentColumn.id

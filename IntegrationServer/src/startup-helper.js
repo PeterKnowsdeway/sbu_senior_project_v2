@@ -4,10 +4,7 @@ const { setConfigVariables } = require('./config/config-helper.js')
 
 const OAuth2Client = require('./OAuth/google-auth.js').OAuthClient
 
-console.log('I made it to startup-helper.js')
-
 async function setOAuthCredentials () {
-  console.log('I made it to setUpOAuthCreds in startup-helper.js')
   try {
     const token = await fs.readFile('./token.json')
     OAuth2Client.credentials = JSON.parse(token)
@@ -22,7 +19,6 @@ async function setOAuthCredentials () {
 }
 
 async function loadConfigVariables () {
-  console.log('I made it to loadConfigVariables in startup-helper.js')
   try {
     const config = await fs.readFile('./config.json')
     console.log('loading config')

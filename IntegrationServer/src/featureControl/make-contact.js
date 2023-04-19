@@ -19,7 +19,6 @@ const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') /
 async function makeNewContact (req, res) {
   try {
     // gets the contact info from monday.com
-    const itemMap = req.body.payload.inboundFieldValues.itemMapping
     const itemID = JSON.stringify(req.body.payload.inboundFieldValues.itemId)
 
     // Sequilize database. Tries to get itemMapping with the same itemID if it exists for error-handling
@@ -33,7 +32,7 @@ async function makeNewContact (req, res) {
       return res.status(200).send({})
     }
 
-    await makeContact(itemId, itemMapping)
+    await makeContact(itemID, itemMapping)
     return res.status(200).send({})
   } catch (error) {
     console.error('Internal Server Error:', error)
@@ -49,6 +48,7 @@ async function makeContact (itemID, itemMap) {
 
   // Request Creation
   await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+}
 
 module.exports = {
   makeNewContact

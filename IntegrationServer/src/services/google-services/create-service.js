@@ -13,7 +13,7 @@ const contactMappingService = require('../database-services/contact-mapping-serv
 async function createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) {
   // calls the people api to create a contact with any information that has been put into the new contact.
   // Normally should just be the name
-  const res = await service.people.createContact({
+  await service.people.createContact({
     requestBody: { // info to push to Google as new contact
       names: [
         {

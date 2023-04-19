@@ -10,10 +10,10 @@ google.options({ auth: OAuth2Client })
 const { configVariables } = require('../config/config-helper.js')
 
 // API handler for pushing information to existing contacts
-const { updateContactService } = require('../services/google-services/update-service.js') 
+const { updateContactService } = require('../services/google-services/update-service.js')
 
 // Information parser
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') 
+const { formatColumnValues, nameSplit } = require('../util/contact-parser.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.
@@ -44,7 +44,7 @@ async function updateContactInfo (req, res) {
       console.log('Error in update existing contact: ' + err)
     }
     return res.status(409).send({})
-  } else { 
+  } else {
     console.log('No chance on update to contact')
     return res.status(200).send({})
   }

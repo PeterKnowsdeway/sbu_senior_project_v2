@@ -10,7 +10,7 @@ const { getBoardItems } = require('../services/monday-service.js')
 
 // API handlers for updating and creating contacts in the People API
 const { updateContactService } = require('../services/google-services/update-service.js')
-const { createContactService } = require('../services/google-services/create-service.js') 
+const { createContactService } = require('../services/google-services/create-service.js')
 
 // Information parser
 const { parseColumnValues, nameSplit } = require('../util/contact-parser.js')
@@ -29,7 +29,7 @@ const { initializeConfig } = require('../util/config-maker.js')
  * database of contacts or syncs with an existing database of contacts
  * @param req - The request object
  * @param res - The response object
- 
+
 */
 
 async function fetchContacts (req, res) {
@@ -82,17 +82,21 @@ async function fetchContacts (req, res) {
 */
 async function syncWithExistingContacts (boardItems) {
   const batchSize = 5
-  let batches = []
+  const batches = []
 
   for (let i = 0; i < boardItems.length; i += batchSize) {
     batches.push(boardItems.slice(i, i + batchSize))
   }
 
-  for (let batch of batches) {
-    let promises = []
+  for (const batch of batches) {
+    const promises = []
 
-    for (let currentItem of batch) {
+    for (const currentItem of batch) {
       promises.push(processContactItem(currentItem))
+    }
+
+    if (promises.length % 27 === 0) {
+      await sleep(20000)
     }
 
     await Promise.all(promises)
@@ -101,7 +105,7 @@ async function syncWithExistingContacts (boardItems) {
   return null
 }
 
-async function processContactItem(currentItem) {
+async function processContactItem (currentItem) {
   const name = currentItem.name
   const nameArr = await nameSplit(name)
   const { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
