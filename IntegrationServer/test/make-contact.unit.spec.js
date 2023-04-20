@@ -67,14 +67,14 @@ describe('makeContactController', () => {
       send: sinon.stub().returns()
     }
     // Call controller function
-    await formatPhone('1234567890')
+    await phoneFormat('1234567890')
     await createContactServiceStub('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined, callbackStub);
     await makeContactController.makeNewContact(req, res)
    
     // Assert
     expect(contactMappingServiceStub.getContactMapping.calledOnceWithExactly('123')).to.be.true
     expect(nameSplitStub.calledOnceWithExactly('John Doe')).to.be.true
-    expect(await formatPhoneNumberStub.getCall(0).args[0]).to.equal('1234567890');
+    expect(await phoneFormatStub.getCall(0).args[0]).to.equal('1234567890');
     console.log(createContactServiceStub.args)
     expect(await createContactServiceStub.calledOnceWithExactly('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined)).to.be.true
     expect(res.status.calledOnceWithExactly(200)).to.be.true

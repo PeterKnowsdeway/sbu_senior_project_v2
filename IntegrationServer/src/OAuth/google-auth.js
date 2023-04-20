@@ -18,6 +18,8 @@ const SCOPES = ['https://www.googleapis.com/auth/contacts']
 
 google.options({ auth: OAuth2Client })
 
+const TOKEN_PATH = "./token.json"
+
 /**
  *
  *
@@ -25,66 +27,73 @@ google.options({ auth: OAuth2Client })
  * @param res - The response object.
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
-async function setUpOAuth (req, res) {
-  const TOKEN_PATH = './token.json'
-  try {
-    const token = await asyncGet(TOKEN_PATH)
-    OAuth2Client.credentials = JSON.parse(token)
-    const returnUrl = req.session.backToUrl
-    return res.redirect(returnUrl)
-  } catch (err) {
-    console.error(err)
-    client.set('returnURl', req.session.backToUrl)
-    try {
-      const url = OAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES
-      })
-      return res.redirect(url)
-    } catch (err) {
-      console.error('The URL could not be generated', err)
-      return res.status(500).send(err.message)
+async function setUpOAuth (req, res) {    
+  if (fs.existsSync(TOKEN_PATH)) {
+    fs.readFile(TOKEN_PATH, (err, token) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        OAuth2Client.credentials = JSON.parse(token);;
+        let returnUrl = asyncGet("returnURl", (err, reply) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            return reply;
+        });
+        return res.redirect(returnUrl);
+    });
+  } else {
+        asyncDel("returnURl", req.session.backToUrl);
+        let url = OAuth2Client.generateAuthUrl({
+            // 'online' (default) or 'offline' (gets refresh_token)
+            access_type: 'offline',
+            // If you only need one scope you can pass it as a string
+            scope: SCOPES    
+        });
+        return res.redirect(url);
     }
-  }
 }
 
 async function codeHandle (req, res) {
-  try {
-    const backToUrl = await asyncGet('returnURl')
-    if (!backToUrl) {
-      return res.status(400).send('backToUrl is not set')
-    } else {
-      await asyncDel('returnURl')
-      const TOKEN_PATH = './token.json'
-      try {
-        await fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
-        const token = await fs.promises.readFile(TOKEN_PATH)
-        OAuth2Client.credentials = JSON.parse(token)
-        return res.redirect(backToUrl)
-      } catch (err) {
-        const code = req.query.code
-        console.log(code)
-        try {
-          const { tokens } = await OAuth2Client.getToken(code)
-          OAuth2Client.credentials = tokens
-          console.log(tokens)
-          await fs.promises.writeFile(TOKEN_PATH, JSON.stringify(tokens))
-          console.log('Token stored to', TOKEN_PATH)
-          return res.redirect(backToUrl)
-        } catch (err) {
-          console.error('Error getting token:', err.message)
-          return res.status(500).send()
-        }
-      }
+    const backToUrl = await asyncGet("returnURl");
+    if(!backToUrl) 
+      return res.status(200).send({});
+    else {
+        asyncDel("returnURl");   
+        if (!(fs.existsSync(TOKEN_PATH))) {
+            const TOKEN_PATH = "./token.json"
+            const code = req.query['code'];
+            console.log(code);
+  
+            OAuth2Client.getToken(code, (err, token) => {
+            if (err) 
+              return console.error('Error retrieving access token', err);
+            OAuth2Client.credentials = token;
+            console.log(token);
+            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+                if (err) return console.error(err);
+                console.log('Token stored to', TOKEN_PATH);
+            });
+            //Store the token to disk for later program executions
+        });
+        return res.redirect(backToUrl);
     }
-  } catch (err) {
-    console.error(err)
-    return res.status(500).send(err)
+    //If the token exists, sets up OAuth2 client
+    else {
+        fs.readFile(TOKEN_PATH, (err, token) => {
+            if (err) return console.error(err);
+            OAuth2Client.credentials = JSON.parse(token);
+        });
+        return res.redirect(backToUrl);
+    }
   }
 }
 
 module.exports = {
-  codeHandle,
-  setUpOAuth,
-  OAuthClient: OAuth2Client
-}
+    codeHandle,
+    setUpOAuth,
+    'OAuthClient': OAuth2Client
+};
+

@@ -84,25 +84,29 @@ describe('OAuth2Client', function () {
 })
 
 // UNIT TESTS
-/* describe('setUpOAuth', () => {
+describe('setUpOAuth', () => {
   let req;
   let res;
   let asyncGetStub;
   let redirectStub;
   let generateAuthUrlStub;
+  const url = 'https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcontacts&response_type=code&client_id=.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fsbuseniorprojectv2.tumekie1999.repl.co%2FtokenHandle';
+   const SCOPES = ['https://www.googleapis.com/auth/contacts']
 
   beforeEach(() => {
     req = {
       session: {
-        backToUrl: 'http://localhost:3000/auth'
+        backToUrl: url
       }
     };
     res = {
       redirect: sinon.stub(),
       send: sinon.stub(),
+      status: sinon.stub().returns(res)
     };
     asyncGetStub = sinon.stub(asyncGet, 'bind');
     generateAuthUrlStub = sinon.stub(OAuth2Client.prototype, 'generateAuthUrl');
+    sinon.stub(fs, 'existsSync').returns(false)
   });
 
   afterEach(() => {
@@ -115,32 +119,107 @@ describe('OAuth2Client', function () {
     asyncGetStub.withArgs('./token.json').resolves(token);
     await setUpOAuth(req, res);
     sinon.assert.calledOnce(res.redirect);
-    sinon.assert.calledWith(res.redirect, 'http://localhost:3000/auth');
+    sinon.assert.calledWith(res.redirect, url);
   });
 
-  it('should redirect to Google OAuth2 page if token does not exist', async () => {
-    asyncGetStub.withArgs('./token.json').rejects(new Error('Token not found'));
-    generateAuthUrlStub.returns('http://google.com/auth');
-    await setUpOAuth(req, res);
-    sinon.assert.calledOnce(generateAuthUrlStub);
-    sinon.assert.calledWith(generateAuthUrlStub, {
+   it('should redirect to authorization URL if token does not exist', async () => {
+    await setUpOAuth(req, res)
+    assert.ok(res.redirect.calledOnceWith(url))
+    assert.ok(fs.existsSync.calledOnceWith('./token.json'))
+    assert.ok(OAuth2Client.prototype.generateAuthUrl.calledOnceWith({
       access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/contacts'],
-      redirect_uri: 'http://localhost:3000/tokenHandle',
+      scope: SCOPES
+    }))
+  })
+});
+
+/* describe('codeHandle', () => {
+  let req;
+  let res;
+  let OAuth2Client;
+  let asyncGet;
+  let asyncDel;
+  let codeHandle;
+
+  beforeEach(() => {
+    req = {
+      query: {},
+    };
+
+    res = {
+      status: sinon.stub().returnsThis(),
+      send: sinon.stub().returnsThis(),
+      redirect: sinon.stub().returnsThis(),
+    };
+
+    OAuth2Client = {
+      getToken: sinon.stub(),
+      credentials: null,
+    };
+
+    asyncGet = sinon.stub().resolves(null);
+    asyncDel = sinon.stub().resolves(null);
+    codeHandle = proxyquire('../src/OAuth/google-auth', {
+      'googleapis': {
+        auth: {
+          OAuth2: sinon.stub().returns(OAuth2Client),
+        },
+        options: sinon.stub(),
+      },
+      '../../src/middleware/redis.js': {
+        asyncGet,
+        asyncDel,
+      },
     });
-    sinon.assert.calledOnce(res.redirect);
-    sinon.assert.calledWith(res.redirect, 'http://google.com/auth');
   });
 
-  it('should return 500 status if URL cannot be generated', async () => {
-    asyncGetStub.withArgs('./token.json').rejects(new Error('Token not found'));
-    generateAuthUrlStub.throws(new Error('Unable to generate URL'));
-    const statusStub = sinon.stub(res, 'status').returns(res);
-    const sendStub = sinon.stub(res, 'send').returns(res);
-    await setUpOAuth(req, res);
-    sinon.assert.calledOnce(statusStub);
-    sinon.assert.calledWith(statusStub, 500);
-    sinon.assert.calledOnce(sendStub);
-    sinon.assert.calledWith(sendStub, 'Unable to generate URL');
+  it('should return 200 status and empty response if backToUrl is not found', async () => {
+    await codeHandle(req, res);
+    expect(asyncGet.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(res.status.calledOnceWithExactly(200)).to.be.true;
+    expect(res.send.calledOnceWithExactly({})).to.be.true;
+    expect(asyncDel.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(res.redirect.notCalled).to.be.true;
   });
+
+  it('should redirect to backToUrl if token file exists', async () => {
+    const token = { access_token: 'ACCESS_TOKEN', refresh_token: 'REFRESH_TOKEN' };
+    asyncGet.resolves('http://localhost:3000');
+
+    fs.existsSync.returns(true);
+    fs.readFile.callsFake((path, callback) => {
+      callback(null, JSON.stringify(token));
+    });
+
+    await codeHandle(req, res);
+
+    expect(OAuth2Client.credentials).to.deep.equal(token);
+    expect(asyncGet.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(asyncDel.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(res.redirect.calledOnceWithExactly('http://localhost:3000')).to.be.true;
+  });
+  it('should exchange code for token and redirect to backToUrl if token file does not exist', async () => {
+    asyncGet.resolves('http://localhost:3000');
+
+    fs.existsSync.returns(false);
+
+    OAuth2Client.getToken.callsFake((code, callback) => {
+      callback(null, { access_token: 'ACCESS_TOKEN', refresh_token: 'REFRESH_TOKEN' });
+    });
+
+    fs.writeFile.callsFake((path, data, callback) => {
+      callback();
+    });
+
+    await codeHandle({ query: { code: 'CODE' } }, res);
+
+    expect(OAuth2Client.getToken.calledOnceWithExactly('CODE', sinon.match.func)).to.be.true;
+    expect(OAuth2Client.credentials).to.deep.equal({ access_token: 'ACCESS_TOKEN', refresh_token: 'REFRESH_TOKEN' });
+    expect(asyncGet.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(asyncDel.calledOnceWithExactly('returnURl')).to.be.true;
+    expect(fs.writeFile.calledOnceWithExactly('./token.json', JSON.stringify({ access_token: 'ACCESS_TOKEN', refresh_token: 'REFRESH_TOKEN' }), sinon.match.func)).to.be.true;
+    expect(res.redirect.calledOnceWithExactly('http://localhost:3000')).to.be.true;
+    // Ensure that res.status is not called if backToUrl exists
+    expect(res.status.called).to.be.false;
+  })
 }); */

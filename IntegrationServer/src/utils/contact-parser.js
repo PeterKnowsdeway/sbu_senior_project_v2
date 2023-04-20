@@ -76,7 +76,7 @@ async function parseColumnValues (currentItem, configVariables) {
 
   for (const currentColumn of currentItem.column_values) {
     const columnId = currentColumn.id
-
+    console.log(columnId);
     switch (columnId) {
       case primaryEmailID:
         arrEmails.push({ value: currentColumn.text, type: 'work', formattedType: 'Work' })

@@ -50,12 +50,12 @@ describe('parseColumnValues', () => {
   beforeEach(() => {
     currentItemMock = {
       column_values: [
-        { id: '123', text: 'john.doe@example.com' },
-        { id: 'secondary_email', text: 'jane.doe@example.com' },
-        { id: 'work_phone', text: '1234567890' },
-        { id: 'mobile_phone', text: '0987654321' },
-        { id: 'notes', text: 'Some notes' },
-        { id: 'item_id', text: '1' }
+        { id: 'primaryEmailID', text: 'john.doe@example.com' },
+        { id: 'secondaryEmailID', text: 'jane.doe@example.com' },
+        { id: 'workPhoneID', text: '1234567890' },
+        { id: 'mobilePhoneID', text: '0987654321' },
+        { id: 'notesID', text: 'Some notes' },
+        { id: 'itemID', text: '1' }
       ]
     };
   });
@@ -73,7 +73,7 @@ describe('parseColumnValues', () => {
       arrNotes: [
         { value: 'Some notes', contentType: 'TEXT_PLAIN' }
       ],
-      itemID: '1'
+      itemID: 1
     }
 
     const result = await parseColumnValues(currentItemMock, configVariables)
