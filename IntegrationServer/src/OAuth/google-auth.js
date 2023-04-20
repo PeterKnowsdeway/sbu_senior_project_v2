@@ -5,7 +5,7 @@
 
 const { google } = require('googleapis')
 const fs = require('fs')
-const { client, asyncGet, asyncDel } = require('../middleware/redis.js')
+const { client, asyncGet, asyncDel, asyncGet } = require('../middleware/redis.js')
 
 const OAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -27,34 +27,28 @@ const TOKEN_PATH = "./token.json"
  * @param res - The response object.
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
-async function setUpOAuth (req, res) {    
-  if (fs.existsSync(TOKEN_PATH)) {
+async function setUpOAuth (req, res) {	
+	if (fs.existsSync(TOKEN_PATH)) {
     fs.readFile(TOKEN_PATH, (err, token) => {
         if (err) {
-            console.error(err);
-            return;
-        }
+				    console.error(err);
+				    return;
+			  }
         OAuth2Client.credentials = JSON.parse(token);;
-        let returnUrl = asyncGet("returnURl", (err, reply) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            return reply;
-        });
-        return res.redirect(returnUrl);
+			  let returnUrl = req.session.backToUrl;
+			  return res.redirect(returnUrl);
     });
-  } else {
-        asyncDel("returnURl", req.session.backToUrl);
-        let url = OAuth2Client.generateAuthUrl({
-            // 'online' (default) or 'offline' (gets refresh_token)
-            access_type: 'offline',
-            // If you only need one scope you can pass it as a string
-            scope: SCOPES    
-        });
-        return res.redirect(url);
-    }
-}
+	} else {
+	    asyncSet("returnURl", req.session.backToUrl);
+	    let url = OAuth2Client.generateAuthUrl({
+          // 'online' (default) or 'offline' (gets       refresh_token)
+		      access_type: 'offline',
+          // If you only need one scope you can pass it as a string
+		      scope: SCOPES	
+	    });
+	    return res.redirect(url);
+	  }
+  }
 
 async function codeHandle (req, res) {
     const backToUrl = await asyncGet("returnURl");
@@ -63,7 +57,6 @@ async function codeHandle (req, res) {
     else {
         asyncDel("returnURl");   
         if (!(fs.existsSync(TOKEN_PATH))) {
-            const TOKEN_PATH = "./token.json"
             const code = req.query['code'];
             console.log(code);
   

@@ -31,6 +31,18 @@ async function asyncGet (key) {
   }
 }
 
+async function asyncSet (key, value) {
+  try {
+    // If Redis client is not connected, connect to Redis
+    // Attempt to retrieve data from Redis
+    const data = await client.set(key, value)
+    return data
+  } catch (err) {
+    console.error(`Error setting ${key} from Redis: ${err}`)
+    throw err
+  }
+}
+
 async function asyncDel (key) {
   try {
     const result = await client.del(key)
@@ -44,5 +56,6 @@ async function asyncDel (key) {
 module.exports = {
   client,
   asyncGet,
-  asyncDel
+  asyncDel,
+  asyncSet
 }
