@@ -14,7 +14,7 @@ const contactMappingService = require('../services/database-services/contact-map
 const { configVariables } = require('../config/config-helper.js')
 
 const { createContactService } = require('../services/google-services/create-service')
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
+const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js') // Information parser
 
 async function makeNewContact (req, res) {
   try {

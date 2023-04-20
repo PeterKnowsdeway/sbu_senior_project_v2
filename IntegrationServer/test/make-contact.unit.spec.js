@@ -49,10 +49,10 @@ describe('makeContactController', () => {
     // Override modules with stubs
     const stubs = {
       '../../src/services/database-services/contact-mapping-service': contactMappingServiceStub,
-      '../../src/utils/formatPhoneNumber.js': {
-        formatPhoneNumber: formatPhoneNumberStub
+      '../../src/utils/contact-parser.js': {
+        phoneFormat: phoneFormatStub
       },
-      '../../src/utils/nameSplit.js': {
+      '../../src/utils/contact-parser.js': {
         nameSplit: nameSplitStub
       },
       '../../src/services/google-services/create-service': {
@@ -67,7 +67,7 @@ describe('makeContactController', () => {
       send: sinon.stub().returns()
     }
     // Call controller function
-    await formatPhoneNumberStub('1234567890')
+    await formatPhone('1234567890')
     await createContactServiceStub('John Doe', ['John', 'Doe'], 'testuser@example.com', undefined, '123-456-7890', undefined, undefined, undefined, undefined, callbackStub);
     await makeContactController.makeNewContact(req, res)
    

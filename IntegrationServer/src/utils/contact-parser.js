@@ -28,24 +28,24 @@ async function phoneFormat (phone) {
   }
 }
 
-async function formatColumnValues (itemMap) {
+async function formatColumnValues (itemMap, configVariables) {
   const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID
-  } = configVariables
+    notesID,
+  } = configVariables;
 
-  const workPhone = await phoneFormat(itemMap[workPhoneID])
-  const mobilePhone = await phoneFormat(itemMap[mobilePhoneID])
-  const primaryEmail = itemMap[primaryEmailID]
-  const secondaryEmail = itemMap[secondaryEmailID]
-  const notes = itemMap[notesID]
+  let workPhone = await phoneFormat(itemMap[workPhoneID]);
+  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
+  const primaryEmail = itemMap[primaryEmailID];
+  const secondaryEmail = itemMap[secondaryEmailID];
+  const notes = itemMap[notesID];
 
-  const arrEmails = []
-  const arrPhoneNumbers = []
-  const arrNotes = []
+  let arrEmails= []
+  let arrPhoneNumbers=[]
+  let arrNotes = []
 
   arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
   arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
@@ -56,11 +56,11 @@ async function formatColumnValues (itemMap) {
   return {
     arrEmails,
     arrPhoneNumbers,
-    arrNotes
+    arrNotes,
   }
 }
 
-async function parseColumnValues (currentItem) {
+async function parseColumnValues (currentItem, configVariables) {
   const {
     primaryEmailID,
     secondaryEmailID,

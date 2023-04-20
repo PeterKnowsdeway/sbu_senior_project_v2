@@ -19,7 +19,7 @@ describe('setConfigVariables', () => {
 
     await setConfigVariables(config);
 
-    expect(configVariables.workPhoneId).to.equal('work-phone-id-123');
+    expect(configVariables.workPhoneID).to.equal('work-phone-id-123');
     expect(configVariables.mobilePhoneID).to.equal('mobile-phone-id-123');
     expect(configVariables.primaryEmailID).to.equal('primary-email-id-123');
     expect(configVariables.secondaryEmailID).to.equal('secondary-email-id-123');

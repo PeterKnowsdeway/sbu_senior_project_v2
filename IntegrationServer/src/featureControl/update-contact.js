@@ -13,7 +13,7 @@ const { configVariables } = require('../config/config-helper.js')
 const { updateContactService } = require('../services/google-services/update-service.js')
 
 // Information parser
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js')
+const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.

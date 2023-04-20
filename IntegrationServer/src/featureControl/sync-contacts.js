@@ -13,12 +13,12 @@ const { updateContactService } = require('../services/google-services/update-ser
 const { createContactService } = require('../services/google-services/create-service.js')
 
 // Information parser
-const { parseColumnValues, nameSplit } = require('../util/contact-parser.js')
+const { parseColumnValues, nameSplit } = require('../utils/contact-parser.js')
 
 /* Import the configVariables from the config-helper.js file. */
 // List of IDs for the various titles being looked at on Monday.com
 const { configVariables } = require('../config/config-helper.js')
-const { initializeConfig } = require('../util/config-maker.js')
+const { initializeConfig } = require('../utils/config-maker.js')
 
 // NOTE:
 // Monday will send a duplicate request if it doesn't get a response in 30 seconds, for 30 minutes, or until 200 response.
