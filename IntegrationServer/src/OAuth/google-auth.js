@@ -5,7 +5,7 @@
 
 const { google } = require('googleapis')
 const fs = require('fs')
-const { client, asyncGet, asyncDel } = require('../middleware/redis.js')
+const { client, asyncGet, asyncDel, asyncSet } = require('../middleware/redis.js')
 
 const OAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -35,7 +35,7 @@ async function setUpOAuth (req, res) {
             return;
         }
         OAuth2Client.credentials = JSON.parse(token);;
-        let returnUrl = asyncGet("returnURl", (err, reply) => {
+        let returnUrl = asyncSet("returnURl", (err, reply) => {
             if (err) {
                 console.error(err);
                 return;
@@ -57,27 +57,28 @@ async function setUpOAuth (req, res) {
 }
 
 async function codeHandle (req, res) {
-    const backToUrl = await asyncGet("returnURl");
-    if(!backToUrl) 
-      return res.status(200).send({});
-    else {
-        asyncDel("returnURl");   
-        if (!(fs.existsSync(TOKEN_PATH))) {
-            const TOKEN_PATH = "./token.json"
-            const code = req.query['code'];
-            console.log(code);
-  
-            OAuth2Client.getToken(code, (err, token) => {
-            if (err) 
-              return console.error('Error retrieving access token', err);
-            OAuth2Client.credentials = token;
-            console.log(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
-                console.log('Token stored to', TOKEN_PATH);
-            });
-            //Store the token to disk for later program executions
-        });
+  const backToUrl = await asyncGet("returnURl");
+  console.log(backToUrl)
+  if(!backToUrl) {
+    return res.status(200).send({});
+  } else {
+      asyncDel("returnURl");
+      if (!(fs.existsSync(TOKEN_PATH))) {
+          const TOKEN_PATH = "./token.json"
+          const code = req.query['code'];
+          console.log(code);
+
+          OAuth2Client.getToken(code, (err, token) => {
+          if (err) 
+            return console.error('Error retrieving access token', err);
+          OAuth2Client.credentials = token;
+          console.log(token);
+          fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+              if (err) return console.error(err);
+              console.log('Token stored to', TOKEN_PATH);
+          });
+          //Store the token to disk for later program executions
+      });
         return res.redirect(backToUrl);
     }
     //If the token exists, sets up OAuth2 client
