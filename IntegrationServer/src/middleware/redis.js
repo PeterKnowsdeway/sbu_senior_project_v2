@@ -32,15 +32,14 @@ async function asyncGet (key) {
   }
 }
 
-async function asyncSet (key) {
+async function asyncSet (key, value) {
   try {
     // If Redis client is not connected, connect to Redis
     // Attempt to retrieve data from Redis
-    const data = await client.set(key)
-    console.log(data)
+    const data = await client.set(key, value)
     return data
   } catch (err) {
-    console.error(`Error retrieving ${key} from Redis: ${err}`)
+    console.error(`Error setting ${key} from Redis: ${err}`)
     throw err
   }
 }
