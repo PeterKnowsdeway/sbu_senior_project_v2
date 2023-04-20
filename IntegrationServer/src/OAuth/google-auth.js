@@ -5,7 +5,7 @@
 
 const { google } = require('googleapis')
 const fs = require('fs')
-const { client, asyncGet, asyncDel, asyncGet } = require('../middleware/redis.js')
+const { client, asyncGet, asyncDel, asyncSet } = require('../middleware/redis.js')
 
 const OAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,

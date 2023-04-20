@@ -43,7 +43,9 @@ const addToQueue = async (handler) => {
 
 router.post('/create', authenticationMiddleware, async (req, res) => {
   try {
-    await addToQueue(() => makeContact(req, res))
+    await addToQueue(async () => {
+      await makeContact(req, res)
+    });
     res.status(200).send({})
   } catch (err) {
     console.log(err)
@@ -53,8 +55,9 @@ router.post('/create', authenticationMiddleware, async (req, res) => {
 
 router.post('/update', authenticationMiddleware, async (req, res) => {
   try {
-    await addToQueue(() => updateContact(req, res))
-    res.status(200).send({})
+    await addToQueue(async () => {
+      await updateContact(req, res)
+    });
   } catch (err) {
     console.log(err)
     res.status(500).send('Error processing request')
@@ -63,8 +66,9 @@ router.post('/update', authenticationMiddleware, async (req, res) => {
 
 router.post('/sync', authenticationMiddleware, async (req, res) => {
   try {
-    await addToQueue(() => fetchContacts(req, res))
-    res.status(200).send({})
+    await addToQueue(async () => {
+      await fetchContacts(req, res)
+    });
   } catch (err) {
     console.log(err)
     res.status(500).send('Error processing request')
