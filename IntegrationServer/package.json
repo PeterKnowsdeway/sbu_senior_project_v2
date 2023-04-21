@@ -41,7 +41,8 @@
 		"sqlite3": "^5.0.4",
 		"supertest": "^6.3.3",
 		"tmp": "^0.2.1",
-		"util": "^0.12.5"
+		"util": "^0.12.5",
+		"winston": "^3.8.2"
 	},
 	"devDependencies": {
 		"chai": "^4.3.7",

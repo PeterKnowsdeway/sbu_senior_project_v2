@@ -20,6 +20,8 @@ const { parseColumnValues, nameSplit } = require('../utils/contact-parser.js')
 const { configVariables } = require('../config/config-helper.js')
 const { initializeConfig } = require('../utils/config-maker.js')
 
+const { logger } = require('../middleware/logging.js');
+
 // NOTE:
 // Monday will send a duplicate request if it doesn't get a response in 30 seconds, for 30 minutes, or until 200 response.
 

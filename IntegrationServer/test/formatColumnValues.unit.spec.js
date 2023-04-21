@@ -48,16 +48,41 @@ describe('parseColumnValues', () => {
   let currentItemMock;
 
   beforeEach(() => {
-    currentItemMock = {
-      column_values: [
-        { id: 'primaryEmailID', text: 'john.doe@example.com' },
-        { id: 'secondaryEmailID', text: 'jane.doe@example.com' },
-        { id: 'workPhoneID', text: '1234567890' },
-        { id: 'mobilePhoneID', text: '0987654321' },
-        { id: 'notesID', text: 'Some notes' },
-        { id: 'itemID', text: '1' }
-      ]
-    };
+      let currentItemMock = [
+      {
+        column_values: [
+          {
+            id: '1234',
+            title: process.env.WORK_PHONE_TITLE
+          },
+          {
+            id: '5678',
+            title: process.env.MOBILE_PHONE_TITLE
+          },
+          {
+            id: '91011',
+            title: process.env.EMAIL_PRIMARY_TITLE
+          },
+          {
+            id: '121314',
+            title: process.env.EMAIL_SECONDARY_TITLE
+          },
+          {
+            id: '151617',
+            title: process.env.NOTES_TITLE
+          },
+          {
+            id: '181920',
+            title: 'other column'
+          },
+          {
+            settings: {
+              createNewDatabase: true
+            }
+          },
+        ],
+      }
+    ];
   });
 
   it('should parse column values correctly', async () => {
