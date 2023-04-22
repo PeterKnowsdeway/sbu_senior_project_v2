@@ -36,11 +36,21 @@ function useAccessToken () {
       resourceName: 'people/me',
       personFields: 'metadata'
     }, (err, res) => {
-      if (err) return console.error('The API returned an error: ' + err)
+      if (err) {
+        logger.error({
+          message: `The API returned an error: ${err}`,
+          function: 'useAccessToken',
+          error: err.stack
+        })
+        return;
+      }
       updateToken()
     })
   } else {
-    console.log('No credentials set for access token update')
+    logger.warn({
+      message: 'No credentials set for access token update',
+      function: 'useAccessToken'
+    })
   }
 }
 
