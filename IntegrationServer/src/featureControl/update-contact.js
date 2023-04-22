@@ -1,6 +1,5 @@
 /**
  * This file is responsible for updating the contacts in the Google Contacts API.
- * It is called by the webhook when a contact is updated in the Airtable.
  */
 const { google } = require('googleapis')
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
@@ -14,6 +13,8 @@ const { updateContactService } = require('../services/google-services/update-ser
 
 // Information parser
 const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js')
+
+const { logger } = require('../middleware/logging.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.
@@ -41,11 +42,19 @@ async function updateContactInfo (req, res) {
       await updateExisting(itemID, itemMap, updateExisting)
       return res.status(200).send({})
     } catch (err) {
-      console.log('Error in update existing contact: ' + err)
+      logger.error({
+        message: `Error in update existing contact: ${err.message}`,
+        function: 'updateContactInfo',
+        params: { itemID, itemMap }
+      })
+      return res.status(500).json({ error: 'Internal Server Error' })
     }
-    return res.status(409).send({})
   } else {
-    console.log('No chance on update to contact')
+    logger.info({
+      message: 'No update to contact',
+      function: 'updateContactInfo',
+      params: { changedColumnId }
+    })
     return res.status(200).send({})
   }
 }
@@ -59,11 +68,20 @@ async function updateContactInfo (req, res) {
  * updateExisting will be called with the updated information
  */
 async function updateExisting (itemID, itemMap) {
-  const name = itemMap.name
-  const nameArr = await nameSplit(name)
-  const { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
+  try {
+    const name = itemMap.name
+    const nameArr = await nameSplit(name)
+    const { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
 
-  await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+    await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+  } catch (err) {
+    logger.error({
+      message: `Error updating contact: ${err.message}`,
+      function: 'updateExisting',
+      params: { itemID, itemMap }
+    })
+    throw err
+  }
 }
 
 module.exports = {
