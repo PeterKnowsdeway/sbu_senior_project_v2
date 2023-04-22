@@ -14,7 +14,7 @@ const { updateContactService } = require('../services/google-services/update-ser
 // Information parser
 const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js')
 
-const { logger } = require('../middleware/logging.js')
+const { logger } = require('../middlewar/logging.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.
