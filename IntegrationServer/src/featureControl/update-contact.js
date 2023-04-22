@@ -14,7 +14,7 @@ const { updateContactService } = require('../services/google-services/update-ser
 // Information parser
 const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js')
 
-const { logger } = require('../middlewar/logging.js')
+const logger = require('../middleware/logging.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.
@@ -45,7 +45,8 @@ async function updateContactInfo (req, res) {
       logger.error({
         message: `Error in update existing contact: ${err.message}`,
         function: 'updateContactInfo',
-        params: { itemID, itemMap }
+        params: { itemID, itemMap },
+        error: err.stack
       })
       return res.status(500).json({ error: 'Internal Server Error' })
     }

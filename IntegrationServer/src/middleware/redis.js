@@ -5,6 +5,7 @@
  */
 
 const redis = require('redis')
+const logger = require('./logging.js')
 
 const client = redis.createClient({
   host: process.env.REDIS_HOST,
@@ -27,7 +28,11 @@ async function asyncGet (key) {
     console.log(data)
     return data
   } catch (err) {
-    console.error(`Error retrieving ${key} from Redis: ${err}`)
+    logger.error({
+      message: `Error retrieving ${key} from Redis: ${err}`,
+      function: 'asyncGet',
+      params: { key }
+    })
     throw err
   }
 }
@@ -39,7 +44,11 @@ async function asyncSet (key, value) {
     const data = await client.set(key, value)
     return data
   } catch (err) {
-    console.error(`Error setting ${key} from Redis: ${err}`)
+    logger.error({
+      message: `Error setting ${key} in Redis: ${err}`,
+      function: 'asyncSet',
+      params: { key, value }
+    })
     throw err
   }
 }
@@ -49,7 +58,11 @@ async function asyncDel (key) {
     const result = await client.del(key)
     return result
   } catch (err) {
-    console.error(`Error deleting ${key} from Redis: ${err}`)
+    logger.error({
+      message: `Error deleting ${key} in Redis: ${err}`,
+      function: 'asyncDel',
+      params: { key }
+    })
     throw err
   }
 }

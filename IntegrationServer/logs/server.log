@@ -1,0 +1,87 @@
+error: Apr-22-2023 15:46:24: 	undefined
+info: Apr-22-2023 15:46:24: 	work-phone-id-123
+info: Apr-22-2023 15:46:24: 	mobile-phone-id-123
+info: Apr-22-2023 15:46:24: 	primary-email-id-123
+info: Apr-22-2023 15:46:24: 	secondary-email-id-123
+info: Apr-22-2023 15:46:24: 	notes-id-123
+info: Apr-22-2023 15:46:24: 	Create new database upon sync = true
+info: Apr-22-2023 15:46:24: 	1234
+info: Apr-22-2023 15:46:24: 	5678
+info: Apr-22-2023 15:46:24: 	91011
+info: Apr-22-2023 15:46:24: 	121314
+info: Apr-22-2023 15:46:24: 	151617
+info: Apr-22-2023 15:46:24: 	Create new database upon sync = false
+info: Apr-22-2023 15:46:24: 	1234
+info: Apr-22-2023 15:46:24: 	5678
+info: Apr-22-2023 15:46:24: 	91011
+info: Apr-22-2023 15:46:24: 	121314
+info: Apr-22-2023 15:46:24: 	151617
+info: Apr-22-2023 15:46:24: 	Create new database upon sync = false
+error: Apr-22-2023 15:46:29: 	undefined
+info: Apr-22-2023 15:48:25: 	work-phone-id-123
+info: Apr-22-2023 15:48:25: 	mobile-phone-id-123
+info: Apr-22-2023 15:48:25: 	primary-email-id-123
+info: Apr-22-2023 15:48:25: 	secondary-email-id-123
+info: Apr-22-2023 15:48:25: 	notes-id-123
+info: Apr-22-2023 15:48:25: 	Create new database upon sync = true
+info: Apr-22-2023 15:48:25: 	1234
+info: Apr-22-2023 15:48:25: 	5678
+info: Apr-22-2023 15:48:25: 	91011
+info: Apr-22-2023 15:48:25: 	121314
+info: Apr-22-2023 15:48:25: 	151617
+info: Apr-22-2023 15:48:25: 	Create new database upon sync = false
+info: Apr-22-2023 15:48:25: 	1234
+info: Apr-22-2023 15:48:25: 	5678
+info: Apr-22-2023 15:48:25: 	91011
+info: Apr-22-2023 15:48:25: 	121314
+info: Apr-22-2023 15:48:25: 	151617
+info: Apr-22-2023 15:48:25: 	Create new database upon sync = false
+error: Apr-22-2023 15:48:31: 	undefined
+error: Apr-22-2023 15:49:32: 	undefined
+error: Apr-22-2023 15:49:32: 	Error validating token: done is not defined
+error: Apr-22-2023 15:49:32: 	Error validating token: jwt malformed
+info: Apr-22-2023 15:49:32: 	work-phone-id-123
+info: Apr-22-2023 15:49:32: 	mobile-phone-id-123
+info: Apr-22-2023 15:49:32: 	primary-email-id-123
+info: Apr-22-2023 15:49:32: 	secondary-email-id-123
+info: Apr-22-2023 15:49:32: 	notes-id-123
+info: Apr-22-2023 15:49:32: 	Create new database upon sync = true
+info: Apr-22-2023 15:49:32: 	1234
+info: Apr-22-2023 15:49:32: 	5678
+info: Apr-22-2023 15:49:32: 	91011
+info: Apr-22-2023 15:49:32: 	121314
+info: Apr-22-2023 15:49:32: 	151617
+info: Apr-22-2023 15:49:32: 	Create new database upon sync = false
+info: Apr-22-2023 15:49:32: 	1234
+info: Apr-22-2023 15:49:32: 	5678
+info: Apr-22-2023 15:49:32: 	91011
+info: Apr-22-2023 15:49:32: 	121314
+info: Apr-22-2023 15:49:32: 	151617
+info: Apr-22-2023 15:49:32: 	Create new database upon sync = false
+error: Apr-22-2023 15:49:32: 	Error validating token: jwt must be provided
+error: Apr-22-2023 15:49:32: 	Error validating token: jwt must be provided
+error: Apr-22-2023 15:49:34: 	undefined
+error: Apr-22-2023 15:51:52: authRequestMiddleware: : 	Error validating token: done is not defined
+error: Apr-22-2023 15:51:52: : : 	undefined
+error: Apr-22-2023 15:51:52: authRequestMiddleware: : 	Error validating token: jwt malformed
+info: Apr-22-2023 15:51:52: : : 	work-phone-id-123
+info: Apr-22-2023 15:51:52: : : 	mobile-phone-id-123
+info: Apr-22-2023 15:51:52: : : 	primary-email-id-123
+info: Apr-22-2023 15:51:52: : : 	secondary-email-id-123
+info: Apr-22-2023 15:51:52: : : 	notes-id-123
+info: Apr-22-2023 15:51:52: : : 	Create new database upon sync = true
+info: Apr-22-2023 15:51:52: : : 	1234
+info: Apr-22-2023 15:51:52: : : 	5678
+info: Apr-22-2023 15:51:52: : : 	91011
+info: Apr-22-2023 15:51:52: : : 	121314
+info: Apr-22-2023 15:51:52: : : 	151617
+info: Apr-22-2023 15:51:52: : : 	Create new database upon sync = false
+info: Apr-22-2023 15:51:52: : : 	1234
+info: Apr-22-2023 15:51:52: : : 	5678
+info: Apr-22-2023 15:51:52: : : 	91011
+info: Apr-22-2023 15:51:52: : : 	121314
+info: Apr-22-2023 15:51:52: : : 	151617
+info: Apr-22-2023 15:51:52: : : 	Create new database upon sync = false
+error: Apr-22-2023 15:51:52: authRequestMiddleware: : 	Error validating token: jwt must be provided
+error: Apr-22-2023 15:51:52: authRequestMiddleware: : 	Error validating token: jwt must be provided
+error: Apr-22-2023 15:51:54: : : 	undefined

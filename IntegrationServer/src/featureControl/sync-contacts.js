@@ -13,13 +13,13 @@ const { updateContactService } = require('../services/google-services/update-ser
 const { createContactService } = require('../services/google-services/create-service.js') 
 
 
-const { parseColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
+const { parseColumnValues, nameSplit } = require('../utils/contact-parser.js') // Information parser
 
 /* Import the configVariables from the config-helper.js file. */
 const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
-const { initializeConfig } = require('../util/config-maker.js')
+const { initializeConfig } = require('../utils/config-maker.js')
 
-const { logger } = require('../middleware/logging.js')
+const logger = require('../middleware/logging.js')
 
 // NOTE:
 // Monday will send a duplicate request if it doesn't get a response in 30 seconds, for 30 minutes, or until 200 response.
@@ -50,17 +50,22 @@ async function fetchContacts (req, res) {
         await syncWithExistingContacts(boardItems) // Update EXISTING database (contacts)
         break
       default:
-       logger.error({ message: `Error: Config variables corrupt. createNewDatabase: ${createNewDatabase}`, 
-                    function: `fetchContact`, 
-                    params: { boardID, createNewDatabase } })
+       logger.error({ 
+          message: `Error: Config variables corrupt. createNewDatabase: ${createNewDatabase}`, 
+          function: `fetchContact`, 
+          params: { boardID, createNewDatabase },
+        })
         return res.status(500).json({ error: 'Internal Server Error' })
     }
 
     return res.status(200).send({})
   } catch (err) {
-    logger.error({ message: `Internal Server Error: ${err}`, 
-                    function: `fetchContact`, 
-                    params: { boardID, createNewDatabase } })
+    logger.error({ 
+      message: `Internal Server Error: ${err}`, 
+      function: `fetchContact`, 
+      params: { boardID, createNewDatabase },
+      error: err.stack
+    })
     return res.status(500).json({ error: 'Internal Server Error' })
   } finally {
     if (release) {

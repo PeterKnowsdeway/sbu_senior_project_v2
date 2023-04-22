@@ -6,6 +6,7 @@
 const { google } = require('googleapis')
 const fs = require('fs')
 const { client, asyncGet, asyncDel, asyncSet } = require('../middleware/redis.js')
+const logger = require('../middleware/logging.js')
 
 const OAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -29,57 +30,97 @@ const TOKEN_PATH = "./token.json"
  */
 async function setUpOAuth (req, res) {	
 	if (fs.existsSync(TOKEN_PATH)) {
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) {
-				    console.error(err);
-				    return;
-			  }
-        OAuth2Client.credentials = JSON.parse(token);;
-			  let returnUrl = req.session.backToUrl;
-			  return res.redirect(returnUrl);
-    });
-	} else {
-	    asyncSet("returnURl", req.session.backToUrl);
-	    let url = OAuth2Client.generateAuthUrl({
-          // 'online' (default) or 'offline' (gets       refresh_token)
-		      access_type: 'offline',
-          // If you only need one scope you can pass it as a string
-		      scope: SCOPES	
-	    });
-	    return res.redirect(url);
-	  }
-  }
+		fs.readFile(TOKEN_PATH, (err, token) => {
+			if (err) {
+				logger.error({
+          message: `Error reading ${TOKEN_PATH}`,
+          function: 'setUpOAuth',
+          params: { TOKEN_PATH, token },
+          error: err.stack
+        });
+				return res.status(500).send('Internal Server Error');
+			}
 
-async function codeHandle (req, res) {
-    const backToUrl = await asyncGet("returnURl");
-    if(!backToUrl) 
-      return res.status(200).send({});
-    else {
-        asyncDel("returnURl");   
-        if (!(fs.existsSync(TOKEN_PATH))) {
-            const code = req.query['code'];
-            console.log(code);
-  
-            OAuth2Client.getToken(code, (err, token) => {
-            if (err) 
-              return console.error('Error retrieving access token', err);
-            OAuth2Client.credentials = token;
-            console.log(token);
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
-                console.log('Token stored to', TOKEN_PATH);
+			OAuth2Client.credentials = JSON.parse(token);;
+			let returnUrl = req.session.backToUrl;
+			return res.redirect(returnUrl);
+		});
+	} else {
+		try {
+			await asyncSet("returnURl", req.session.backToUrl);
+			let url = OAuth2Client.generateAuthUrl({
+				access_type: 'offline',
+				scope: SCOPES	
+			});
+			return res.redirect(url);
+		} catch (err) {
+			logger.error({
+        message: `Error setting returnURl in Redis`,
+        function: 'setUpOAuth',
+        params: { returnURl: req.session.backToUrl },
+        error: err.stack
+      });
+			return res.status(500).send('Internal Server Error');
+		}
+	}
+}
+
+async function codeHandle(req, res) {
+  const backToUrl = await asyncGet("returnURl");
+  if (!backToUrl) {
+    return res.status(200).send({});
+  } else {
+    asyncDel("returnURl");
+    if (!fs.existsSync(TOKEN_PATH)) {
+      const code = req.query["code"];
+      logger.info({
+        message: `Received code ${code}`,
+        function: "codeHandle",
+        params: { backToUrl, TOKEN_PATH },
+      });
+
+      OAuth2Client.getToken(code, (err, token) => {
+        if (err) {
+          logger.error({
+            message: `Error retrieving access token: ${err}`,
+            function: "codeHandle",
+            params: { backToUrl, TOKEN_PATH },
+          });
+          return;
+        }
+        OAuth2Client.credentials = token;
+        fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+          if (err) {
+            logger.error({
+              message: `Error storing token to ${TOKEN_PATH}: ${err}`,
+              function: "codeHandle",
+              params: { backToUrl, TOKEN_PATH },
+              error: err.stack
             });
-            //Store the token to disk for later program executions
+            return;
+          }
+          logger.info({
+            message: `Token stored to ${TOKEN_PATH}`,
+            function: "codeHandle",
+            params: { backToUrl, TOKEN_PATH },
+          });
         });
         return res.redirect(backToUrl);
-    }
-    //If the token exists, sets up OAuth2 client
-    else {
-        fs.readFile(TOKEN_PATH, (err, token) => {
-            if (err) return console.error(err);
-            OAuth2Client.credentials = JSON.parse(token);
-        });
+      });
+    } else {
+      fs.readFile(TOKEN_PATH, (err, token) => {
+        if (err) {
+          logger.error({
+            message: `Error reading ${TOKEN_PATH}: ${err}`,
+            function: "codeHandle",
+            params: { backToUrl, TOKEN_PATH },
+            error: err.stack
+          });
+          return;
+        }
+        OAuth2Client.credentials = JSON.parse(token);
         return res.redirect(backToUrl);
+      });
     }
   }
 }

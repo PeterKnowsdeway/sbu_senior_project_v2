@@ -1,4 +1,4 @@
-const { logger } = require('../middleware/logging.js');
+const logger = require('../middleware/logging.js');
 /* Creating a JSON object with the keys and values. */
 const configVariables = {
   workPhoneID: '',
@@ -53,7 +53,7 @@ async function setConfigVariables (config) {
       configVariables.createNewDatabase = settings.createNewDatabase
     }
   } catch (error) {
-    logger.error(error.message);
+    logger.error(error);
     throw error;
   }
 }

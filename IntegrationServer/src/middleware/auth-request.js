@@ -5,7 +5,7 @@
  */
 
 const jswtoken = require('jsonwebtoken') // get the json webtoken library.
-const { logger } = require('./logging.js')
+const logger = require('./logging.js')
 
 async function authRequestMiddleware (req, res, next) {
   try {
@@ -27,7 +27,8 @@ async function authRequestMiddleware (req, res, next) {
     logger.error({
         message: `Error validating token: ${err.message}`,
         function: 'authRequestMiddleware',
-        params: { authorization, req, res }
+        params: { req, res, next },
+        error: err.stack
       })
     res.status(500).json({ error: 'not authenticated' })
   }

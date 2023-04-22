@@ -16,7 +16,7 @@ const { configVariables } = require('../config/config-helper.js')
 const { createContactService } = require('../services/google-services/create-service')
 const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js') // Information parser
 
-const { logger } = require('../middleware/logging.js');
+const logger = require('../middleware/logging.js');
 
 async function makeNewContact (req, res) {
   try {
@@ -39,9 +39,12 @@ async function makeNewContact (req, res) {
     await makeContact(itemID, itemMapping)
     return res.status(200).send({})
   } catch (error) {
-    logger.error({ message: `Internal Server Error: ${error.message}`, 
-                   function: `makeNewContact`, 
-                   params: { reqBody: req.body } })
+    logger.error({ 
+      message: `Internal Server Error: ${error.message}`, 
+      function: `makeNewContact`, 
+      params: { reqBody: req.body },
+      error: error.stack
+    })
     return res.status(500).send({})
   }
 };
