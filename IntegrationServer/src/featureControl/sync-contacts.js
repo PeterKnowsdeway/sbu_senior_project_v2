@@ -10,30 +10,24 @@ const { getBoardItems } = require('../services/monday-service.js')
 
 // API handlers for updating and creating contacts in the People API
 const { updateContactService } = require('../services/google-services/update-service.js')
-const { createContactService } = require('../services/google-services/create-service.js')
+const { createContactService } = require('../services/google-services/create-service.js') 
 
-// Information parser
-const { parseColumnValues, nameSplit } = require('../utils/contact-parser.js')
+
+const { parseColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
 
 /* Import the configVariables from the config-helper.js file. */
-// List of IDs for the various titles being looked at on Monday.com
-const { configVariables } = require('../config/config-helper.js')
-const { initializeConfig } = require('../utils/config-maker.js')
-
-const { logger } = require('../middleware/logging.js');
+const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
+const { initializeConfig } = require('../util/config-maker.js')
 
 // NOTE:
 // Monday will send a duplicate request if it doesn't get a response in 30 seconds, for 30 minutes, or until 200 response.
 
 /**
-
  * It takes the board items from the board that the user selected, and then it either creates a new
  * database of contacts or syncs with an existing database of contacts
  * @param req - The request object
  * @param res - The response object
-
-*/
-
+ */
 async function fetchContacts (req, res) {
   const { shortLivedToken } = req.session
   const { boardID } = req.body.payload.inputFields
@@ -81,44 +75,29 @@ async function fetchContacts (req, res) {
  * contacts in the database with the information contained in the board
  * @param boardItems - An array of objects that contain the data from the board.
  * @returns null.
-*/
-async function syncWithExistingContacts (boardItems) {
-  const batchSize = 5
-  const batches = []
+ */
+async function syncWithExistingContacts (boardItems) { // updates new and existing database.
+  let boardItemIndex = 0
 
-  for (let i = 0; i < boardItems.length; i += batchSize) {
-    batches.push(boardItems.slice(i, i + batchSize))
-  }
-
-  for (const batch of batches) {
-    const promises = []
-
-    for (const currentItem of batch) {
-      promises.push(processContactItem(currentItem))
-    }
-
-    if (promises.length % 27 === 0) {
+  while (boardItemIndex < boardItems.length) {
+    if ((boardItemIndex + 1) % 14 === 0) {
       await sleep(20000)
     }
 
-    await Promise.all(promises)
+    const currentItem = boardItems[boardItemIndex]
+
+    const name = currentItem.name
+    const nameArr = await nameSplit(name)
+    const { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
+
+    const itemMapping = await contactMappingService.getContactMapping(itemID)
+    if (itemMapping == null) {
+      await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+    } else {
+      await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+    }
+    boardItemIndex++
   }
-
-  return null
-}
-
-async function processContactItem (currentItem) {
-  const name = currentItem.name
-  const nameArr = await nameSplit(name)
-  const { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
-
-  const itemMapping = await contactMappingService.getContactMapping(itemID)
-  if (itemMapping == null) {
-    await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
-  } else {
-    await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
-  }
-
   return null
 }
 
