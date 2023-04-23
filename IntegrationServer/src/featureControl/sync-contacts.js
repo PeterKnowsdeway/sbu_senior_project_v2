@@ -3,23 +3,18 @@ const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 const Mutex = require('async-mutex').Mutex
 const populateLock = new Mutex()
 google.options({ auth: OAuth2Client })
-
+const logger = require('../middleware/logging.js')
 const contactMappingService = require('../services/database-services/contact-mapping-service')
 
 const { getBoardItems } = require('../services/monday-service.js')
-
 // API handlers for updating and creating contacts in the People API
 const { updateContactService } = require('../services/google-services/update-service.js')
-const { createContactService } = require('../services/google-services/create-service.js') 
-
-
+const { createContactService } = require('../services/google-services/create-service.js')
 const { parseColumnValues, nameSplit } = require('../utils/contact-parser.js') // Information parser
-
 /* Import the configVariables from the config-helper.js file. */
-const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
+// List of IDs for the various titles being looked at on Monday.com
+const { configVariables } = require('../config/config-helper.js')
 const { initializeConfig } = require('../utils/config-maker.js')
-
-const logger = require('../middleware/logging.js')
 
 // NOTE:
 // Monday will send a duplicate request if it doesn't get a response in 30 seconds, for 30 minutes, or until 200 response.
@@ -50,19 +45,19 @@ async function fetchContacts (req, res) {
         await syncWithExistingContacts(boardItems) // Update EXISTING database (contacts)
         break
       default:
-       logger.error({ 
-          message: `Error: Config variables corrupt. createNewDatabase: ${createNewDatabase}`, 
-          function: `fetchContact`, 
-          params: { boardID, createNewDatabase },
+        logger.error({
+          message: `Error: Config variables corrupt. createNewDatabase: ${createNewDatabase}`,
+          function: 'fetchContact',
+          params: { boardID, createNewDatabase }
         })
         return res.status(500).json({ error: 'Internal Server Error' })
     }
 
     return res.status(200).send({})
   } catch (err) {
-    logger.error({ 
-      message: `Internal Server Error: ${err}`, 
-      function: `fetchContact`, 
+    logger.error({
+      message: `Internal Server Error: ${err}`,
+      function: 'fetchContact',
       params: { boardID, createNewDatabase },
       error: err.stack
     })
@@ -102,10 +97,10 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
     const { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
 
     logger.info(`Syncing contact ${itemID} with name ${name}`)
-    
+
     const itemMapping = await contactMappingService.getContactMapping(itemID)
     if (itemMapping == null) {
-       logger.info(`Creating new contact ${itemID} with name ${name}`)
+      logger.info(`Creating new contact ${itemID} with name ${name}`)
       await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
     } else {
       logger.info(`Updating existing contact ${itemID} with name ${name}`)
@@ -115,9 +110,6 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
   }
   return null
 }
-
-// FUNCTIONS GO HERE
-
 /**
  * This function will wait for a specified amount of time before continuing with the next line of code.
  * @param ms - The number of milliseconds to wait before resolving the promise.

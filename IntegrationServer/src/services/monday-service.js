@@ -3,7 +3,7 @@
  */
 
 const initMondayClient = require('monday-sdk-js')
-
+const logger = require('../middleware/logging.js')
 /**
  * It takes a token and a boardId as parameters, and returns the items on the board.
  * @param token - The token you get from the OAuth flow
@@ -34,7 +34,12 @@ const getBoardItems = async (token, boardId) => {
     const response = await mondayClient.api(query, { variables })
     return response.data.boards[0].items
   } catch (err) {
-    console.error(err)
+    logger.error({
+      message: `Error retreiving contacts from Monday.com ${err}`,
+      function: 'getBoardItems',
+      params: { token, boardId },
+      error: err.stack
+    })
   }
 }
 

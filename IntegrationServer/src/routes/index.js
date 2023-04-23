@@ -10,6 +10,7 @@ const rateLimiterUsingThirdParty = require('../middleware/rateLimiter.js')
 
 const toContactsRoute = require('./contacts-integration')
 const OAuthSetupRoute = require('./OAuth-helper')
+const logger = require('../middleware/logging.js')
 
 router.use(rateLimiterUsingThirdParty)
 

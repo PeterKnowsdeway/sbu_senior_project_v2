@@ -16,7 +16,7 @@ const { configVariables } = require('../config/config-helper.js')
 const { createContactService } = require('../services/google-services/create-service')
 const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js') // Information parser
 
-const logger = require('../middleware/logging.js');
+const logger = require('../middleware/logging.js')
 
 async function makeNewContact (req, res) {
   try {
@@ -30,18 +30,21 @@ async function makeNewContact (req, res) {
     // if this occurs, there is either an old database-entry with the same itemID somehow.
     // e.g. create was called twice, or the itemIDs are repeating.
     if (itemMapping != null) {
-      logger.error({ message: `A contact with the given ID already exists, cannot create a new contact`, 
-                    function: `makeNewContact`, 
-                    params: { itemID } })
+      logger.error({
+        message: 'A contact with the given ID already exists, cannot create a new contact',
+        function: 'makeNewContact',
+        params: { itemID }
+      })
       return res.status(200).send({})
     }
 
     await makeContact(itemID, itemMapping)
+    
     return res.status(200).send({})
   } catch (error) {
-    logger.error({ 
-      message: `Internal Server Error: ${error.message}`, 
-      function: `makeNewContact`, 
+    logger.error({
+      message: `Internal Server Error: ${error.message}`,
+      function: 'makeNewContact',
       params: { reqBody: req.body },
       error: error.stack
     })

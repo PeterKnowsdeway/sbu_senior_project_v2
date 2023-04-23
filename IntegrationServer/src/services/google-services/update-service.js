@@ -1,6 +1,5 @@
 /*
 This file is responsible for the following:
-- Creating a contact on Google Contacts
 - Updating a contact on Google Contacts
 */
 
@@ -11,6 +10,7 @@ google.options({ auth: OAuth2Client })
 const service = google.people({ version: 'v1', auth: OAuth2Client })
 
 const contactMappingService = require('../database-services/contact-mapping-service')
+const logger = require('../../middleware/logging.js')
 
 /**
  * When called, will push information for the titles located in the env are for the specified item
@@ -28,13 +28,15 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
     resourceName: itemMapping.dataValues.resourceName,
     personFields: 'metadata'
   }, async (err, res) => {
-    if (err) return console.error('The API returned an error at update1: ' + err)
-    else {
+    if (err) {
+      logger.error({
+        message: `Error retreiving contact with People API ${err}`,
+        function: 'updateContactService',
+        params: { name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID },
+        error: err.stack
+      })
+    } else {
       const updatedMapping = await contactMappingService.getContactMapping(itemID)
-      console.log('outer service')
-
-      // THIS IS BROKEN ATM - PUSH WIPES ALL INFORMATION INSTEAD; SEE sync-contacts.js
-      // FOR THE UPDATE CASE IN FUNCTION updateExistingContact FOR COMPARISON
       await service.people.updateContact({
         resourceName: updatedMapping.dataValues.resourceName,
         sources: 'READ_SOURCE_TYPE_CONTACT',
@@ -54,10 +56,24 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
           biographies: arrNotes
         }
       }, async (err, res) => {
-        if (err) console.error('The API returned an error at update2: ' + err)
-        else {
-          console.log('inner update service')
-          await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
+        if (err) {
+          logger.error({
+            message: `Error updating contact in People API: ${err}`,
+            function: 'updateContactService',
+            params: { name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID },
+            error: err.stack
+          })
+        } else {
+          try {
+            await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
+          } catch (err) {
+            logger.error({
+              message: `Error updating contact in database: ${err}`,
+              function: 'updateContactService',
+              params: { itemID },
+              error: err.stack
+            })
+          }
         }
       })
     }

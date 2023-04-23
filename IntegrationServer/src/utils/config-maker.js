@@ -3,6 +3,7 @@ const fs = require('fs')
 
 /* Import the configVariables from the config-helper.js file. */
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
+const logger = require('../middleware/logging.js')
 
 const validTitles = [
   process.env.WORK_PHONE_TITLE,
@@ -30,10 +31,27 @@ async function initializeConfig (boardItems) {
           createNewDatabase: false
         }
       }
-      await setConfigVariables(config)
+      try {
+        await setConfigVariables(config)
+      } catch (err) {
+        logger.error({
+          message: `Error setting to config variables: ${err}`,
+          function: 'initializeConfig',
+          params: { config },
+          error: err.stack
+        })
+      }
       fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) { return err }
-        console.log('config has been stored')
+        if (err) {
+          logger.error({
+            message: `Error writing to config.json: ${err}`,
+            function: 'initializeConfig',
+            params: { boardItems },
+            error: err.stack
+          })
+          return err
+        }
+        logger.info('config has been stored')
       })
     } else {
       let config = fs.readFileSync(conf)
@@ -45,15 +63,26 @@ async function initializeConfig (boardItems) {
       await setConfigVariables(config)
 
       fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) return err
+        if (err) {
+          logger.error({
+            message: `Error writing to config.json: ${err}`,
+            function: 'initializeConfig',
+            params: { boardItems },
+            error: err.stack
+          })
+        }
         console.log('config has been updated')
       })
     }
 
     return null
   } catch (err) {
-    console.error('The initial board configuration has failed: ')
-    console.error(err)
+    logger.error({
+      message: `The initial board configuration has failed: ${err}`,
+      function: 'initializeConfig',
+      params: { boardItems },
+      error: err.stack
+    })
     return 1 // Error has occured - TODO: handle in function call
   }
 }

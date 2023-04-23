@@ -1,4 +1,4 @@
-const logger = require('../middleware/logging.js');
+const logger = require('../middleware/logging.js')
 /* Creating a JSON object with the keys and values. */
 const configVariables = {
   workPhoneID: '',
@@ -43,7 +43,7 @@ async function setConfigVariables (config) {
           configVariables.notesID = currentSection.id
           break
         default:
-          throw new Error(`Unknown section title: ${currentSection.title}`);
+          throw new Error(`Unknown section title: ${currentSection.title}`)
       }
       index++
     }
@@ -53,8 +53,8 @@ async function setConfigVariables (config) {
       configVariables.createNewDatabase = settings.createNewDatabase
     }
   } catch (error) {
-    logger.error(error);
-    throw error;
+    logger.error(error)
+    throw error
   }
 }
 

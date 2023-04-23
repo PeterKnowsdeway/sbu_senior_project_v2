@@ -7,21 +7,30 @@
     - etag (string)
 
   The ContactMapping database is used to keep track of the etag values for each contact.
-  The etag value is used to determine whether or not a contact has been updated since the last time it was synced with HubSpot.
-  The etag value is also used to determine whether or not a contact is new to HubSpot.
-  If a contact is new to HubSpot, then the contact will be created in HubSpot.
-  If a contact has been updated since the last time it was synced with HubSpot, then the contact will be updated in HubSpot.
+  The etag value is used to determine whether or not a contact has been updated since the last time it was synced with Google Cotnacts.
+  The etag value is also used to determine whether or not a contact is new to Google Contacts.
+  If a contact is new to HubSpot, then the contact will be created in Google Contacts.
+  If a contact has been updated since the last time it was synced with Google Contacts, then the contact will be updated in Google Contacts.
 */
 
 const { ContactMapping } = require('../../db/models') // Imports command (which extends from sequilize's db Model?) from contactmapping.js (also see ContactMapping.init)
 
+const logger = require('../../middleware/logging.js')
+
 // Takes an itemID as an argument, and returns the result of a query to the database.
-const getContactMapping = async (itemID) => { // Database query to find item with matching primary key
+// Database query to find item with matching primary key
+const getContactMapping = async (itemID) => {
   try {
-    const queryResult = await ContactMapping.findByPk(itemID) // findByPk is sequilize search command to find a single entry using the PrimaryKey
+    // findByPk is sequilize search command to find a single entry using the PrimaryKey
+    const queryResult = await ContactMapping.findByPk(itemID)
     return queryResult
   } catch (err) {
-    console.error(err)
+    logger.error({
+      message: `Error finding single entry ${itemID}`,
+      function: 'getContactMapping',
+      params: { itemID, queryResult },
+      error: err.stack
+    })
     throw err
   }
 }
@@ -36,7 +45,12 @@ const createContactMapping = async (attributes) => {
       etag // Column content - e.g. "someone@email.com"
     })
   } catch (err) {
-    console.log(err)
+    logger.error({
+      message: `Error creating new entry ${attributes}`,
+      function: 'createContactMapping',
+      params: { itemID, resourceName, etag },
+      error: err.stack
+    })
     throw err
   }
 }
@@ -55,7 +69,12 @@ const updateContactMapping = async (itemID, updates) => {
     )
     return updatedContactMapping
   } catch (err) {
-    console.error(err)
+    logger.error({
+      message: `Error updating existing entry ${itemID}, ${updates}`,
+      function: 'updateContactMapping',
+      params: { itemID, updates },
+      error: err.stack
+    })
     throw err
   }
 }
@@ -70,7 +89,11 @@ const deleteDatabse = async () => {
       }
     )
   } catch (err) {
-    console.error(err)
+    logger.error({
+      message: 'Error destroying database',
+      function: 'updateContactMapping',
+      error: err.stack
+    })
     throw err
   }
 }

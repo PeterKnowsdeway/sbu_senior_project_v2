@@ -25,11 +25,11 @@ async function authRequestMiddleware (req, res, next) {
     next()
   } catch (err) {
     logger.error({
-        message: `Error validating token: ${err.message}`,
-        function: 'authRequestMiddleware',
-        params: { req, res, next },
-        error: err.stack
-      })
+      message: `Error validating token: ${err.message}`,
+      function: 'authRequestMiddleware',
+      params: { req, res, next },
+      error: err.stack
+    })
     res.status(500).json({ error: 'not authenticated' })
   }
 }

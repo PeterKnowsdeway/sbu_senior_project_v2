@@ -1,4 +1,4 @@
-
+const logger = require('../middleware/logging.js')
 const { configVariables } = require('../config/config-helper.js')
 
 async function nameSplit (name) {
@@ -34,18 +34,18 @@ async function formatColumnValues (itemMap, configVariables) {
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID,
-  } = configVariables;
+    notesID
+  } = configVariables
 
-  let workPhone = await phoneFormat(itemMap[workPhoneID]);
-  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
-  const primaryEmail = itemMap[primaryEmailID];
-  const secondaryEmail = itemMap[secondaryEmailID];
-  const notes = itemMap[notesID];
+  const workPhone = await phoneFormat(itemMap[workPhoneID])
+  const mobilePhone = await phoneFormat(itemMap[mobilePhoneID])
+  const primaryEmail = itemMap[primaryEmailID]
+  const secondaryEmail = itemMap[secondaryEmailID]
+  const notes = itemMap[notesID]
 
-  let arrEmails= []
-  let arrPhoneNumbers=[]
-  let arrNotes = []
+  const arrEmails = []
+  const arrPhoneNumbers = []
+  const arrNotes = []
 
   arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
   arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
@@ -56,7 +56,7 @@ async function formatColumnValues (itemMap, configVariables) {
   return {
     arrEmails,
     arrPhoneNumbers,
-    arrNotes,
+    arrNotes
   }
 }
 
@@ -76,7 +76,7 @@ async function parseColumnValues (currentItem, configVariables) {
 
   for (const currentColumn of currentItem.column_values) {
     const columnId = currentColumn.id
-    console.log(columnId);
+    console.log(columnId)
     switch (columnId) {
       case primaryEmailID:
         arrEmails.push({ value: currentColumn.text, type: 'work', formattedType: 'Work' })

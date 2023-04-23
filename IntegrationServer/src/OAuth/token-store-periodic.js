@@ -23,13 +23,16 @@ const fs = require('fs')
 const { google } = require('googleapis')
 
 const OAuth2Client = require('./google-auth.js').OAuthClient
+const TOKEN_PATH = './token.json'
+const logger = require('../middleware/logging.js')
 
 google.options({ auth: OAuth2Client })
 
 function useAccessToken () {
   // Prevent integrations from running if no credentials are set
   if (!(Object.keys(OAuth2Client.credentials).length === 0)) {
-    // Send a blank request to google APi, this will update the access token, and prevent it from expiring in the event the API is not used for weeks on end.
+    // Send a blank request to google APi, this will update the access token, and prevent it from expiring in the event the API is
+    // not used for weeks on end.
     const service = google.people({ version: 'v1', auth: OAuth2Client })
     service.people.connections.list({
       pageSize: 1,
@@ -42,7 +45,7 @@ function useAccessToken () {
           function: 'useAccessToken',
           error: err.stack
         })
-        return;
+        return
       }
       updateToken()
     })
@@ -59,21 +62,42 @@ function useAccessToken () {
 function updateToken () {
   const credentials = JSON.stringify(OAuth2Client.credentials)
 
-  if (fs.existsSync('./token.json')) {
-    fs.readFile('./token.json', (err, token) => {
-      if (err) return console.error(err)
+  if (fs.existsSync(TOKEN_PATH)) {
+    fs.readFile(TOKEN_PATH, (err, token) => {
+      if (err) {
+        logger.error({
+          message: `Error reading ./token.json: ${err}`,
+          function: 'updateToken'
+        })
+        return
+      }
       const cachedCredentials = JSON.parse(token.toString())
       if (JSON.stringify(cachedCredentials) !== credentials) {
-        fs.writeFile('./token.json', credentials, (err) => {
-          if (err) return console.error(err)
-          console.log('Cached token updated')
+        fs.writeFile(TOKEN_PATH, credentials, (err) => {
+          if (err) {
+            logger.error({
+              message: `Error writing to ./token.json: ${err}`,
+              function: 'updateToken'
+            })
+            return
+          }
+          logger.info({
+            message: 'Cached token updated',
+            function: 'updateToken'
+          })
         })
       } else {
-        console.log('No updated to cached token')
+        logger.info({
+          message: 'No update to cached token',
+          function: 'updateToken'
+        })
       }
     })
   }
-  console.log('Update Cached token attempted')
+  logger.info({
+    message: 'Attempted to update cached token',
+    function: 'updateToken'
+  })
 }
 
 module.exports = {
