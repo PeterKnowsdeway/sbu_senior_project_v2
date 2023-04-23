@@ -61,7 +61,7 @@ router.post('/print', authenticationMiddleware, async (req, res) => {
   await mutex.runExclusive(async () => {
     try {
       logger.info(req.body)
-      logger.indo ('printRequest', JSON.stringify(req.body))
+      logger.indo('printRequest', JSON.stringify(req.body))
       return res.status(200).send({})
     } catch (err) {
       logger.error({

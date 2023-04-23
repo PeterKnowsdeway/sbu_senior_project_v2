@@ -39,7 +39,7 @@ async function makeNewContact (req, res) {
     }
 
     await makeContact(itemID, itemMapping)
-    
+
     return res.status(200).send({})
   } catch (error) {
     logger.error({

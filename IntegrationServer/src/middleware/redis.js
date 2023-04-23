@@ -9,8 +9,7 @@ const logger = require('./logging.js')
 
 const client = redis.createClient({
   host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD
+  port: process.env.REDIS_PORT
 });
 
 (async () => {
