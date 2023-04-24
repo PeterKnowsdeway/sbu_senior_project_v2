@@ -26,6 +26,9 @@
     "node-cache": "^5.1.2",
     "node-fetch": "^3.2.6",
     "node-schedule": "^2.1.1",
-    "sequelize": "^6.28.0"
+    "queue-fifo": "^0.2.6",
+    "redis": "^4.6.5",
+    "sequelize": "^6.28.0",
+    "winston": "^3.8.2"
   }
 }

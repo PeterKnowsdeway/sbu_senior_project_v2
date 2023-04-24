@@ -2,8 +2,16 @@ const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist,
 const fs = require('fs')
 
 /* Import the configVariables from the config-helper.js file. */
-const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
+const logger = require('../middleware/logging.js')
+
+const validTitles = [
+  process.env.WORK_PHONE_TITLE,
+  process.env.MOBILE_PHONE_TITLE,
+  process.env.EMAIL_PRIMARY_TITLE,
+  process.env.EMAIL_SECONDARY_TITLE,
+  process.env.NOTES_TITLE
+]
 
 /**
  * Sets up config.json when config.json does not exist. Else it reads the values in config.json
@@ -16,17 +24,34 @@ async function initializeConfig (boardItems) {
     const currentItem = boardItems[0] // container for the current' columns IDs (see above)
 
     if (!(fs.existsSync(conf))) {
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger
+      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) // assume: at least one item in board. otherwise button should not exist to trigger
       const config = {
         columnIds: columnIdConfig,
         settings: {
           createNewDatabase: false
         }
       }
-      await setConfigVariables(config)
+      try {
+        await setConfigVariables(config)
+      } catch (err) {
+        logger.error({
+          message: `Error setting to config variables: ${err}`,
+          function: 'initializeConfig',
+          params: { config },
+          error: err.stack
+        })
+      }
       fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) { return err }
-        console.log('config has been stored')
+        if (err) {
+          logger.error({
+            message: `Error writing to config.json: ${err}`,
+            function: 'initializeConfig',
+            params: { boardItems },
+            error: err.stack
+          })
+          return err
+        }
+        logger.info('config has been stored')
       })
     } else {
       let config = fs.readFileSync(conf)
@@ -38,28 +63,31 @@ async function initializeConfig (boardItems) {
       await setConfigVariables(config)
 
       fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) return err
+        if (err) {
+          logger.error({
+            message: `Error writing to config.json: ${err}`,
+            function: 'initializeConfig',
+            params: { boardItems },
+            error: err.stack
+          })
+        }
         console.log('config has been updated')
       })
     }
 
     return null
   } catch (err) {
-    console.error('The initial board configuration has failed: ')
-    console.error(err)
+    logger.error({
+      message: `The initial board configuration has failed: ${err}`,
+      function: 'initializeConfig',
+      params: { boardItems },
+      error: err.stack
+    })
     return 1 // Error has occured - TODO: handle in function call
   }
 }
 
 function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
-  const validTitles = [
-    process.env.WORK_PHONE_TITLE,
-    process.env.MOBILE_PHONE_TITLE,
-    process.env.EMAIL_PRIMARY_TITLE,
-    process.env.EMAIL_SECONDARY_TITLE,
-    process.env.NOTES_TITLE
-  ]
-
   for (let i = 0; i < currentItem.column_values.length; i++) {
     const currentColumn = currentItem.column_values[i]
     const columnId = currentColumn.id

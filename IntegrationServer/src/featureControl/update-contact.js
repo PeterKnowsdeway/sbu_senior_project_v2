@@ -1,17 +1,20 @@
-const { google } = require('googleapis');
-const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient;
+/**
+ * This file is responsible for updating the contacts in the Google Contacts API.
+ */
+const { google } = require('googleapis')
+const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 
-google.options({auth: OAuth2Client});
+google.options({ auth: OAuth2Client })
 
-const service = google.people({version: 'v1', auth: OAuth2Client});
+const { configVariables } = require('../config/config-helper.js')
 
-const contactMappingService = require('../services/database-services/contact-mapping-service');
+// API handler for pushing information to existing contacts
+const { updateContactService } = require('../services/google-services/update-service.js')
 
-const { configVariables } = require('../config/config-helper.js');
+// Information parser
+const { formatColumnValues, nameSplit } = require('../utils/contact-parser.js')
 
-const { updateContactService } = require('../services/google-services/update-service.js') //API handler for pushing information to existing contacts
-
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') //Information parser
+const logger = require('../middleware/logging.js')
 
 /**
  * It takes the data from the webhook, formats it, and then sends it to the update function.
@@ -19,62 +22,69 @@ const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') /
  * @param res - the response object
  * @returns a promise.
  */
-async function updateContactInfo(req, res) {
-	const { inboundFieldValues } = req.body.payload;
-  const itemMap = inboundFieldValues.itemMapping;
-  const changedColumnId = inboundFieldValues.columnId;
-  const itemID = JSON.stringify(inboundFieldValues.itemId);
+async function updateContactInfo (req, res) {
+  const { inboundFieldValues } = req.body.payload
+  const itemMap = inboundFieldValues.itemMapping
+  const changedColumnId = inboundFieldValues.columnId
+  const itemID = JSON.stringify(inboundFieldValues.itemId)
 
-	const {
+  const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID,
-  } = configVariables;
+    notesID
+  } = configVariables
 
   if ([primaryEmailID, secondaryEmailID, workPhoneID, mobilePhoneID, notesID].includes(changedColumnId)) {
-		try { //Try triggering an update with payload information
-			await updateExisting(itemID, itemMap, updateExisting);
+    // Try triggering an update with payload information
+    try {
+      await updateExisting(itemID, itemMap, updateExisting)
       return res.status(200).send({})
-		} catch(err) { //Error
-			console.log("Catch block1 err: " + err);
-		}
-		return res.status(409).send({});
-	} else { //Column not a synced title
-		console.log("no change on update");
-		return res.status(200).send({});
-	}
+    } catch (err) {
+      logger.error({
+        message: `Error in update existing contact: ${err.message}`,
+        function: 'updateContactInfo',
+        params: { itemID, itemMap },
+        error: err.stack
+      })
+      return res.status(500).json({ error: 'Internal Server Error' })
+    }
+  } else {
+    logger.info({
+      message: 'No update to contact',
+      function: 'updateContactInfo',
+      params: { changedColumnId }
+    })
+    return res.status(200).send({})
+  }
 }
 
-
-////FUNCTIONS////
+/// /FUNCTIONS////
 
 /*
  * When called, will push information for the titles located in the env with specified item information
  * @param itemID - specifies the item that has been changed
  * @param itemMap - contains the information to update object - req payload from monday.com
- * @param [callback] - what function to call in case of failure
- *        // TODO: CHECK callback param: is this something to replace with a const variable due to possible security concerns?
+ * updateExisting will be called with the updated information
  */
-async function updateExisting (itemID, itemMap) { // updates existing database.
-  console.log('I made it to updateExisting')
+async function updateExisting (itemID, itemMap) {
+  try {
+    const name = itemMap.name
+    const nameArr = await nameSplit(name)
+    const { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
 
-  //Get info
-  const name = itemMap.name
-  const nameArr = await nameSplit(name)
-  let { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
-
-  //Request update
-  try{
     await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
-  } catch(error){
-    return error
+  } catch (err) {
+    logger.error({
+      message: `Error updating contact: ${err.message}`,
+      function: 'updateExisting',
+      params: { itemID, itemMap }
+    })
+    throw err
   }
-
-  return 0
 }
 
 module.exports = {
   updateContactInfo
-};
+}
