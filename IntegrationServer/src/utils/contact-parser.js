@@ -1,5 +1,4 @@
-const logger = require('../middleware/logging.js')
-const { configVariables } = require('../config/config-helper.js')
+
 
 async function nameSplit (name) {
   const nameParts = name.trim().split(/\s+/) // Split on one or more whitespace characters

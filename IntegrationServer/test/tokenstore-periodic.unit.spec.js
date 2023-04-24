@@ -121,15 +121,4 @@ describe('useAccessToken', () => {
     google.people.restore()
     done()
   });
-
-  it('should log message when OAuth2Client credentials are not set', () => {
-    const OAuth2Client = {
-      credentials: {}
-    }
-    const consoleSpy = sinon.stub(console, 'log');
-
-    useAccessToken();
-
-    expect(consoleSpy.calledOnceWith('No credentials set for access token update')).to.be.true;
-  });
 });

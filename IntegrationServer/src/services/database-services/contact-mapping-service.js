@@ -1,4 +1,3 @@
-
 /*
   This file contains functions that interact with the ContactMapping database.
   ContactMapping is a Sequilize database that contains two columns:
@@ -28,7 +27,7 @@ const getContactMapping = async (itemID) => {
     logger.error({
       message: `Error finding single entry ${itemID}`,
       function: 'getContactMapping',
-      params: { itemID, queryResult },
+      params: { itemID },
       error: err.stack
     })
     throw err

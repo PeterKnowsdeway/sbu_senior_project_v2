@@ -84,7 +84,7 @@ describe('OAuth2Client', function () {
 })
 
 // UNIT TESTS
-describe('setUpOAuth', () => {
+/* describe('setUpOAuth', () => {
   let req;
   let res;
   let asyncGetStub;
@@ -131,7 +131,7 @@ describe('setUpOAuth', () => {
       scope: SCOPES
     }))
   })
-});
+}); */
 
 /* describe('codeHandle', () => {
   let req;

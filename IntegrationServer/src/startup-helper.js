@@ -3,7 +3,6 @@ const fs = require('fs').promises
 const { setConfigVariables } = require('./config/config-helper.js')
 
 const OAuth2Client = require('./OAuth/google-auth.js').OAuthClient
-const logger = require('./middleware/logging.js')
 
 async function setOAuthCredentials () {
   try {
