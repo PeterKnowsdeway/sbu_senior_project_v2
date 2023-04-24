@@ -40,8 +40,7 @@ async function asyncSet (key, value) {
   try {
     // If Redis client is not connected, connect to Redis
     // Attempt to retrieve data from Redis
-    const data = await client.set(key, value)
-    return data
+    return await client.set(key, value)
   } catch (err) {
     logger.error({
       message: `Error setting ${key} in Redis: ${err}`,
@@ -54,8 +53,7 @@ async function asyncSet (key, value) {
 
 async function asyncDel (key) {
   try {
-    const result = await client.del(key)
-    return result
+    return await client.del(key)
   } catch (err) {
     logger.error({
       message: `Error deleting ${key} in Redis: ${err}`,

@@ -1,5 +1,4 @@
 
-
 async function nameSplit (name) {
   const nameParts = name.trim().split(/\s+/) // Split on one or more whitespace characters
 

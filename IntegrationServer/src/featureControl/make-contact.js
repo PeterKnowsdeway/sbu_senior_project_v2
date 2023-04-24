@@ -50,7 +50,7 @@ async function makeNewContact (req, res) {
     })
     return res.status(500).send({})
   }
-};
+}
 
 async function makeContact (itemID, itemMap) {
   // Get info

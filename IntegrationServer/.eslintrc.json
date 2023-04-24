@@ -2,18 +2,29 @@
     "env": {
         "browser": true,
         "commonjs": true,
-        "es2021": true
+        "es2022": true
     },
     "extends": [
       "standard",
       "plugin:node/recommended",
-      "plugin:security/recommended"
+      "plugin:security/recommended",
+      "plugin:promise/recommended",
+      "plugin:sonarjs/recommended",
+      "plugin:xss/recommended",
+      "eslint:recommended",
+      "plugin:import/recommended"
+      
     ],
     "overrides": [
     ],
     "parserOptions": {
-        "ecmaVersion": "latest"
+        "ecmaVersion": "latest",
+        "sourceType": "module"
     },
+    "plugins": [
+			"unicorn"
+		],
     "rules": {
+
     }
 }

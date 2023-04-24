@@ -21,8 +21,7 @@ const logger = require('../../middleware/logging.js')
 const getContactMapping = async (itemID) => {
   try {
     // findByPk is sequilize search command to find a single entry using the PrimaryKey
-    const queryResult = await ContactMapping.findByPk(itemID)
-    return queryResult
+    return await ContactMapping.findByPk(itemID)
   } catch (err) {
     logger.error({
       message: `Error finding single entry ${itemID}`,
@@ -58,7 +57,7 @@ const createContactMapping = async (attributes) => {
 const updateContactMapping = async (itemID, updates) => {
   const { resourceName, etag } = updates
   try {
-    const updatedContactMapping = await ContactMapping.update(
+    return await ContactMapping.update(
       { resourceName, etag },
       {
         where: {
@@ -66,7 +65,6 @@ const updateContactMapping = async (itemID, updates) => {
         }
       }
     )
-    return updatedContactMapping
   } catch (err) {
     logger.error({
       message: `Error updating existing entry ${itemID}, ${updates}`,
