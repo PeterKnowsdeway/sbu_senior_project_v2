@@ -482,3 +482,344 @@ info: Apr-24-2023 01:06:45: updateToken: : 	Cached token updated: undefined
 info: Apr-24-2023 01:06:45: updateToken: : 	Attempted to update cached token: undefined
 info: Apr-24-2023 01:06:45: updateToken: : 	Attempted to update cached token: undefined
 warn: Apr-24-2023 01:06:45: useAccessToken: : 	No credentials set for access token update: undefined
+error: Apr-24-2023 13:28:13: : : 	undefined: undefined
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: done is not defined: ReferenceError: done is not defined
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.test.js:37:7)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:25:5)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.test.js:39:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: : : 	undefined: undefined
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: jwt malformed: JsonWebTokenError: jwt malformed
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:70:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.test.js:61:11)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: done is not defined: ReferenceError: done is not defined
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:37:7)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:25:5)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:39:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: jwt malformed: JsonWebTokenError: jwt malformed
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:70:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:61:11)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+info: Apr-24-2023 13:28:13: : : 	work-phone-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	mobile-phone-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	primary-email-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	secondary-email-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	notes-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	Create new database upon sync = true: undefined
+info: Apr-24-2023 13:28:13: : : 	work-phone-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	mobile-phone-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	primary-email-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	secondary-email-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	notes-id-123: undefined
+info: Apr-24-2023 13:28:13: : : 	Create new database upon sync = true: undefined
+info: Apr-24-2023 13:28:13: : : 	1234: undefined
+info: Apr-24-2023 13:28:13: : : 	5678: undefined
+info: Apr-24-2023 13:28:13: : : 	91011: undefined
+info: Apr-24-2023 13:28:13: : : 	121314: undefined
+info: Apr-24-2023 13:28:13: : : 	151617: undefined
+info: Apr-24-2023 13:28:13: : : 	Create new database upon sync = false: undefined
+info: Apr-24-2023 13:28:13: : : 	config has been stored: undefined
+error: Apr-24-2023 13:28:13: initializeConfig: : 	The initial board configuration has failed: TypeError: Cannot set properties of undefined (setting 'createNewDatabase'): TypeError: Cannot set properties of undefined (setting 'createNewDatabase')
+    at initializeConfig (/home/runner/sbuseniorprojectv2/IntegrationServer/src/utils/config-maker.js:61:41)
+    at async Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/config-maker.unit.spec.js:74:5)
+info: Apr-24-2023 13:28:13: : : 	1234: undefined
+info: Apr-24-2023 13:28:13: : : 	5678: undefined
+info: Apr-24-2023 13:28:13: : : 	91011: undefined
+info: Apr-24-2023 13:28:13: : : 	121314: undefined
+info: Apr-24-2023 13:28:13: : : 	151617: undefined
+info: Apr-24-2023 13:28:13: : : 	Create new database upon sync = false: undefined
+error: Apr-24-2023 13:28:13: initializeConfig: : 	Error writing to config.json: Error: Error
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/config-maker.unit.spec.js:82:35)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: getContactMapping: : 	Error finding single entry 0: Error: Database query failed
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/contact-mapping-service.spec.js:28:53)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: createContactMapping: : 	Error creating new entry [object Object]: Error: Database create operation failed
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/contact-mapping-service.spec.js:48:51)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: updateContactMapping: : 	Error updating existing entry 1, [object Object]: Error: Database update operation failed
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/contact-mapping-service.spec.js:70:51)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: jwt must be provided: JsonWebTokenError: jwt must be provided
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:60:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:244:7
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:152:5
+error: Apr-24-2023 13:28:13: authRequestMiddleware: : 	Error validating token: jwt must be provided: JsonWebTokenError: jwt must be provided
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:60:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:244:7
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:152:5
+error: Apr-24-2023 13:28:14: getBoardItems: : 	Error retreiving contacts from Monday.com TypeError: Cannot read properties of undefined (reading 'items'): TypeError: Cannot read properties of undefined (reading 'items')
+    at getBoardItems (/home/runner/sbuseniorprojectv2/IntegrationServer/src/services/monday-service.js:35:36)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/monday-service.unit.spec.js:28:7)
+error: Apr-24-2023 13:28:15: : : 	undefined: undefined
+error: Apr-24-2023 13:28:15: getBoardItems: : 	Error retreiving contacts from Monday.com TypeError: Cannot read properties of undefined (reading 'items'): TypeError: Cannot read properties of undefined (reading 'items')
+    at getBoardItems (/home/runner/sbuseniorprojectv2/IntegrationServer/src/services/monday-service.js:35:36)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/test.monday-service.js:28:7)
+error: Apr-24-2023 13:28:15: : : 	undefined: undefined
+info: Apr-24-2023 13:28:15: updateToken: : 	Cached token updated: undefined
+info: Apr-24-2023 13:28:15: updateToken: : 	Attempted to update cached token: undefined
+info: Apr-24-2023 13:28:15: updateToken: : 	Cached token updated: undefined
+info: Apr-24-2023 13:28:15: updateToken: : 	Attempted to update cached token: undefined
+info: Apr-24-2023 13:28:15: updateToken: : 	Attempted to update cached token: undefined
+warn: Apr-24-2023 13:28:15: useAccessToken: : 	No credentials set for access token update: undefined
+error: Apr-24-2023 13:33:38: authRequestMiddleware: : 	Error validating token: done is not defined: ReferenceError: done is not defined
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:37:7)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:25:5)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:39:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:33:38: : : 	undefined: undefined
+error: Apr-24-2023 13:33:38: authRequestMiddleware: : 	Error validating token: jwt malformed: JsonWebTokenError: jwt malformed
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:70:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.spec.js:61:11)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:33:38: authRequestMiddleware: : 	Error validating token: done is not defined: ReferenceError: done is not defined
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.test.js:37:7)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:25:5)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.test.js:39:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:33:38: authRequestMiddleware: : 	Error validating token: jwt malformed: JsonWebTokenError: jwt malformed
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:70:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/auth-request.unit.test.js:61:11)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate._onImmediate (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+info: Apr-24-2023 13:33:38: : : 	work-phone-id-123: undefined
+info: Apr-24-2023 13:33:38: : : 	mobile-phone-id-123: undefined
+info: Apr-24-2023 13:33:38: : : 	primary-email-id-123: undefined
+info: Apr-24-2023 13:33:38: : : 	secondary-email-id-123: undefined
+info: Apr-24-2023 13:33:38: : : 	notes-id-123: undefined
+info: Apr-24-2023 13:33:38: : : 	Create new database upon sync = true: undefined
+info: Apr-24-2023 13:33:38: : : 	1234: undefined
+info: Apr-24-2023 13:33:38: : : 	5678: undefined
+info: Apr-24-2023 13:33:38: : : 	91011: undefined
+info: Apr-24-2023 13:33:38: : : 	121314: undefined
+info: Apr-24-2023 13:33:38: : : 	151617: undefined
+info: Apr-24-2023 13:33:38: : : 	Create new database upon sync = false: undefined
+info: Apr-24-2023 13:33:38: : : 	config has been stored: undefined
+error: Apr-24-2023 13:33:38: initializeConfig: : 	The initial board configuration has failed: TypeError: Cannot set properties of undefined (setting 'createNewDatabase'): TypeError: Cannot set properties of undefined (setting 'createNewDatabase')
+    at initializeConfig (/home/runner/sbuseniorprojectv2/IntegrationServer/src/utils/config-maker.js:61:41)
+    at async Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/config-maker.unit.spec.js:74:5)
+info: Apr-24-2023 13:33:38: : : 	1234: undefined
+info: Apr-24-2023 13:33:39: : : 	5678: undefined
+info: Apr-24-2023 13:33:39: : : 	91011: undefined
+info: Apr-24-2023 13:33:39: : : 	121314: undefined
+info: Apr-24-2023 13:33:39: : : 	151617: undefined
+info: Apr-24-2023 13:33:39: : : 	Create new database upon sync = false: undefined
+error: Apr-24-2023 13:33:39: initializeConfig: : 	Error writing to config.json: Error: Error
+    at Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/config-maker.unit.spec.js:82:35)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:366:21)
+    at Test.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at Runner.runTest (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:666:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:789:12
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:581:14)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:591:7
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:474:14)
+    at cbHookRun (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:539:7)
+    at done (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:310:5)
+    at callFn (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:389:7)
+    at Hook.Runnable.run (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runnable.js:354:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:498:10)
+    at Immediate.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/mocha/lib/runner.js:559:5)
+    at processImmediate (node:internal/timers:466:21)
+error: Apr-24-2023 13:33:39: authRequestMiddleware: : 	Error validating token: jwt must be provided: JsonWebTokenError: jwt must be provided
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:60:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:244:7
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:152:5
+error: Apr-24-2023 13:33:39: authRequestMiddleware: : 	Error validating token: jwt must be provided: JsonWebTokenError: jwt must be provided
+    at Object.module.exports [as verify] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/jsonwebtoken/verify.js:60:17)
+    at authRequestMiddleware (/home/runner/sbuseniorprojectv2/IntegrationServer/src/middleware/auth-request.js:19:72)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:144:13)
+    at Route.dispatch (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/route.js:114:3)
+    at Layer.handle [as handle_request] (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:244:7
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async /home/runner/sbuseniorprojectv2/IntegrationServer/node_modules/express-rate-limit/dist/index.cjs:152:5
+error: Apr-24-2023 13:33:40: getBoardItems: : 	Error retreiving contacts from Monday.com TypeError: Cannot read properties of undefined (reading 'items'): TypeError: Cannot read properties of undefined (reading 'items')
+    at getBoardItems (/home/runner/sbuseniorprojectv2/IntegrationServer/src/services/monday-service.js:35:36)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Context.<anonymous> (/home/runner/sbuseniorprojectv2/IntegrationServer/test/monday-service.unit.spec.js:28:7)
+error: Apr-24-2023 13:33:40: : : 	undefined: undefined
+info: Apr-24-2023 13:33:40: updateToken: : 	Cached token updated: undefined
+info: Apr-24-2023 13:33:40: updateToken: : 	Attempted to update cached token: undefined
+info: Apr-24-2023 13:33:40: updateToken: : 	Cached token updated: undefined
+info: Apr-24-2023 13:33:40: updateToken: : 	Attempted to update cached token: undefined
+info: Apr-24-2023 13:33:40: updateToken: : 	Attempted to update cached token: undefined
+warn: Apr-24-2023 13:33:40: useAccessToken: : 	No credentials set for access token update: undefined
