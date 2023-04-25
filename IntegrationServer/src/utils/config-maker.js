@@ -4,6 +4,7 @@ const fs = require('fs')
 /* Import the configVariables from the config-helper.js file. */
 const setConfigVariables = require('../config/config-helper.js').setConfigVariables
 const logger = require('../middleware/logging.js')
+const { deleteDatabse } = require('../services/database-services/contact-mapping-service');
 
 const validTitles = [
   process.env.WORK_PHONE_TITLE,
@@ -25,6 +26,8 @@ async function initializeConfig (boardItems) {
 
     if (!(fs.existsSync(conf))) {
       columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) // assume: at least one item in board. otherwise button should not exist to trigger
+      deleteDatabse(); //No config - reset database TODO: Write a case for this to not trigger
+      
       const config = {
         columnIds: columnIdConfig,
         settings: {
