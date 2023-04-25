@@ -37,7 +37,7 @@ async function setUpOAuth (req, res) {
           logger.error({
             message: `Error reading ${TOKEN_PATH}`,
             function: 'setUpOAuth',
-            params: { TOKEN_PATH, token },
+            params: { TOKEN_PATH },
             error: err.stack
           })
           return res.status(500).send()
@@ -65,7 +65,7 @@ async function setUpOAuth (req, res) {
 
 async function codeHandle (req, res) {
   const backToUrl = await asyncGet(RETURN_URL_KEY)
-  if (backToUrl == undefined) {
+  if (backToUrl === undefined) {
     return res.status(200).send({})
   } else {
     await asyncDel(RETURN_URL_KEY)
@@ -78,7 +78,7 @@ async function codeHandle (req, res) {
           })
           .catch(err => {
             logger.info({
-              message: `Received code ${code}`,
+              message: `Received code ${err}`,
               function: 'codeHandle',
               params: { backToUrl, TOKEN_PATH }
             })
@@ -87,7 +87,7 @@ async function codeHandle (req, res) {
       })
       .catch(() => {
         const code = req.query.code
-        console.log(code)
+        logger.info(code)
         OAuth2Client.getToken(code)
           .then(token => {
             OAuth2Client.credentials = token

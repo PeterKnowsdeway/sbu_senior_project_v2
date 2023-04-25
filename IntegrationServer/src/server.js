@@ -1,19 +1,29 @@
-require('dotenv').config() // required for us to use process.env
-const express = require('express') // node.js express
-const bodyParser = require('body-parser') // node.js filter for POSTs
-const app = express() // express instance.
+// Required for us to use process.env
+require('dotenv').config() 
+// Node.js express
+const express = require('express') 
+// Node.js filter for POSTs
+const bodyParser = require('body-parser') 
+// Express instance.
+const app = express() 
 const schedule = require('node-schedule')
 
-const routes = require('./routes') // Import all of the exported router objects from the routes folder into this file.
+// Import all of the exported router objects from the routes folder into this file.
+const routes = require('./routes') 
 // Telling the app to "listen at" with routes passed in will enable all the defined endpoints.
 const { setOAuthCredentials } = require('./startup-helper.js')
 const { loadConfigVariables } = require('./startup-helper.js')
 
-// require file to make it's code run upon startup.
-const { useAccessToken } = require('./OAuth/token-store-periodic.js') // temporary access token refresher - schedules itself to run periodically when loaded, to keep the access token from expiring
-schedule.scheduleJob('0 * * * *', useAccessToken) // Schedules useAccessToken to run every hour
+// Require file to make it's code run upon startup.
+// Temporary access token refresher 
+// Schedules itself to run periodically when loaded, to keep the access token from expiring
+const { useAccessToken } = require('./OAuth/token-store-periodic.js') 
 
-app.use(bodyParser.json()) // Have all requests filtered through bodyParser so that the body of all the POST requests sent to the API to be read and used.
+// Schedules useAccessToken to run every hour
+schedule.scheduleJob('0 * * * *', useAccessToken) 
+
+// Have all requests filtered through bodyParser so that the body of all the POST requests sent to the API to be read and used.
+app.use(bodyParser.json()) 
 
 // Print the method, path, and ip of all requests. This will act as middleware that all requests are filtered through.
 app.use(function (req, res, next) {
@@ -23,25 +33,35 @@ app.use(function (req, res, next) {
 })
 
 // run startup functions
-setOAuthCredentials() // IF token.json exists (aka OAuth Credentials), load them.
-loadConfigVariables() // IF config.json exists, load them.
+// IF token.json exists (aka OAuth Credentials), load them.
+// IF config.json exists, load them.
+setOAuthCredentials() 
+loadConfigVariables() 
 
-app.use(routes) // Tells the app to mount the paths contained in the router object imported from routes/index.js
+// Tells the app to mount the paths contained in the router object imported from routes/index.js
+app.use(routes) 
 
-const { PORT: port } = process.env // get port number from environment file.
+// Get port number from environment file.
+const { PORT: port } = process.env 
 
-const run = process.env.RUN // determine which tunnel to run
-if (run === 'Dev') { // custom tunnel - currently set for loca.lt (localTunnel; not actually local). Loca.lt is NOT reliable for sub-domain.
-  const { createTunnel } = require('./tunnelHelper/tunnel') // requires tunnel.js system file's createTunnel function for tunnel creation
+// Determine which tunnel to run
+// custom tunnel - currently set for loca.lt (localTunnel; not actually local). Loca.lt is NOT reliable for sub-domain.
+// requires tunnel.js system file's createTunnel function for tunnel creation
+const run = process.env.RUN 
+if (run === 'Dev') { 
+  const { createTunnel } = require('./tunnelHelper/tunnel') 
 
+  // See tunnelHelper/tunnel.js - this sends a request to loca.lt which will attempt to get the .env specified sub-domain.
   app.listen(port, () => {
-    createTunnel(port) // see tunnelHelper/tunnel.js - this sends a request to loca.lt which will attempt to get the .env specified sub-domain.
+    createTunnel(port) 
   })
 } else { // replit
   // Tell the app to listen at port, and then create a tunnel.
-  app.listen(port, () => { // Request replit to use a specific port for node.js to run on.
-    console.log(`Listening on port: ${port}`) // replit has its own stuff for node.js setups which run automatically when started.
+  // Request replit to use a specific port for node.js to run on.
+  // Replit has its own stuff for node.js setups which run automatically when started.
+  app.listen(port, () => { 
+    console.log(`Listening on port: ${port}`) 
   })
 }
 
-module.exports = app // module.exports is a node.js thing which is needed for express to trigger endpoints?
+module.exports = app 

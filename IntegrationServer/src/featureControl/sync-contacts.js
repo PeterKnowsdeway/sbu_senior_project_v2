@@ -87,7 +87,7 @@ async function syncWithExistingContacts (boardItems) { // updates new and existi
 
   while (boardItemIndex < boardItems.length) {
     if ((boardItemIndex + 1) % 14 === 0) {
-      await sleep(20000)
+      await sleep(30000)
     }
 
     const currentItem = boardItems[boardItemIndex]
