@@ -17,7 +17,7 @@ async function initializeConfig (boardItems) {
   try {
     let columnIdConfig = []
     const currentItem = boardItems[0] // container for the current' columns IDs (see above)
-    columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger.
+    columnIdConfig = await getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger.
     //This wil get the *current* columns with matching Title name. In case a header name ever changes (e.g. deleted and remade), this needs to check every time.
 
     await dbCheck(); //Check: if config doesn't exist, or setting createNewDatabase == true, delete db.
@@ -44,7 +44,7 @@ async function initializeConfig (boardItems) {
   }
 }
 
-function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
+async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   const validTitles = [
     process.env.WORK_PHONE_TITLE,
     process.env.MOBILE_PHONE_TITLE,
@@ -85,5 +85,6 @@ async function dbCheck() {
 }
 
 module.exports = {
-  initializeConfig
+  initializeConfig,
+  getColumnIdConfig
 }
