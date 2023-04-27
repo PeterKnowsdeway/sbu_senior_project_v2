@@ -69,14 +69,11 @@ async function codeHandle (req, res) {
       })
       .catch(() => {
         const code = req.query.code
-        logger.info(code)
         OAuth2Client.getToken(code)
           .then(token => {
             OAuth2Client.credentials = token
-            logger.info(token)
             fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token))
               .then(() => {
-                logger.info('Token stored to', TOKEN_PATH)
                 return res.redirect(backToUrl)
               })
               .catch(err => {
