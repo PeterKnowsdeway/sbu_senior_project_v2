@@ -40,7 +40,7 @@ async function fetchContacts (req, res) {
     const boardItems = await getBoardItems(shortLivedToken, boardID)
     release = await populateLock.acquire() // Mutex lock - Locks sync from triggering again if already running.
 
-    initializeConfig(boardItems)
+    await initializeConfig(boardItems)
 
     switch (createNewDatabase) {
       case true:
