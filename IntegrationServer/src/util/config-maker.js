@@ -17,38 +17,24 @@ async function initializeConfig (boardItems) {
   try {
     let columnIdConfig = []
     const currentItem = boardItems[0] // container for the current' columns IDs (see above)
+    columnIdConfig = await getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger.
+    //This wil get the *current* columns with matching Title name. In case a header name ever changes (e.g. deleted and remade), this needs to check every time.
 
-    if (!(fs.existsSync(conf))) {
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger
+    await dbCheck(); //Check: if config doesn't exist, or setting createNewDatabase == true, delete db.
 
-      deleteDatabse(); //No config - reset database
-
-      const config = {
-        columnIds: columnIdConfig,
-        settings: {
-          createNewDatabase: false
-        }
+    let config = { //object to be used for setting config.json (hard copy for restarts)
+      columnIds: columnIdConfig,
+      settings: {
+        createNewDatabase: false
       }
-      await setConfigVariables(config)
-      fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) { return err }
-        console.log('config has been stored')
-      })
-    } else {
-
-      let config = fs.readFileSync(conf)
-      config = await JSON.parse(config)
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0)
-      config.columnIds = columnIdConfig
-      config.settings.createNewDatabase = false
-
-      await setConfigVariables(config)
-
-      fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) return err
-        console.log('config has been updated')
-      })
     }
+
+    await setConfigVariables(config) //internal set for server. temp.
+
+    fs.writeFile(conf, JSON.stringify(config), (err) => { //make/update config.json
+      if (err) { return err }
+      console.log('config has been stored')
+    })
 
     return null
   } catch (err) {
@@ -58,7 +44,7 @@ async function initializeConfig (boardItems) {
   }
 }
 
-function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
+async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   const validTitles = [
     process.env.WORK_PHONE_TITLE,
     process.env.MOBILE_PHONE_TITLE,
@@ -85,6 +71,20 @@ function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   return columnIdConfig
 }
 
+async function dbCheck() {
+  if (!(fs.existsSync(conf))) { //no config - assume deletion.
+    deleteDatabse()
+  } else {
+    let config = fs.readFileSync(conf)
+    config = await JSON.parse(config)
+
+    if(config.settings.createNewDatabase == true) {
+      deletedatabse();
+    }
+  }
+}
+
 module.exports = {
-  initializeConfig
+  initializeConfig,
+  getColumnIdConfig
 }

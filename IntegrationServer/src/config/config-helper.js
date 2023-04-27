@@ -1,7 +1,3 @@
-const fs = require('fs');
-
-
-
 /* Creating a JSON object with the keys and values. */
 const configVariables = {
 	"workPhoneID": '',
@@ -48,9 +44,7 @@ async function setConfigVariables (config){
 			}
 		index++;
 	}
-	if(settings.createNewDatabase != undefined)
-	{
-		console.log("Create new database upon sync = " + settings.createNewDatabase);
+	if(settings.createNewDatabase != undefined) {
 		configVariables.createNewDatabase = settings.createNewDatabase;
 	}
 }
