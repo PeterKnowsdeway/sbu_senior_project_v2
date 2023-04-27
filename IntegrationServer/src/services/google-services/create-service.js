@@ -14,7 +14,7 @@ const logger = require('../../middleware/logging.js')
 async function createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) {
   // calls the people api to create a contact with any information that has been put into the new contact.
   // Normally should just be the name
-  await service.people.createContact({
+  const res =await service.people.createContact({
     requestBody: { // info to push to Google as new contact
       names: [
         {
@@ -36,22 +36,14 @@ async function createContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
         params: { name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID },
         error: err.stack
       })
+      return console.error('The API returned an error: ' + err)
     }
     // Create internal contact mapping for database
-    try {
-      await contactMappingService.createContactMapping({
-        itemID,
-        resourceName: res.data.resourceName,
-        etag: res.data.etag
-      })
-    } catch (err) {
-      logger.error({
-        message: `Error creating contact in database ${err}`,
-        function: 'createContactService',
-        params: { itemID, resourceName, etag },
-        error: err.stack
-      })
-    }
+    await contactMappingService.createContactMapping({
+      itemID,
+      resourceName: res.data.resourceName,
+      etag: res.data.etag
+    })
   })
   return 0
 }

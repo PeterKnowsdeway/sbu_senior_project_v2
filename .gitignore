@@ -12,3 +12,6 @@
 /.upm
 /package-lock.json
 /package.json
+/token.json
+/dump.rdb
+/logs

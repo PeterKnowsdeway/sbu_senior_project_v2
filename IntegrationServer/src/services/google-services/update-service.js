@@ -64,16 +64,7 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
             error: err.stack
           })
         } else {
-          try {
-            await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
-          } catch (err) {
-            logger.error({
-              message: `Error updating contact in database: ${err}`,
-              function: 'updateContactService',
-              params: { itemID },
-              error: err.stack
-            })
-          }
+          await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
         }
       })
     }

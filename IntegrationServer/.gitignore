@@ -1,8 +1,13 @@
 /.env
 /config.json
 /token.json
-node_modules
+/node_modules
+/
 /package-lock.json
 /.env
 /token.json
 /database.sqlite3
+/dump.rdb
+/.breakpoints
+/.upm
+/package.json

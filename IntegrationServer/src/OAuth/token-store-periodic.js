@@ -60,7 +60,7 @@ function useAccessToken () {
 // Checks if the token.json file exists, if it does, it reads the file and compares it to the
 // current credentials, if they are different, it writes the new credentials to the file.
 function updateToken () {
-  const credentials = JSON.stringify(OAuth2Client.credentials.refresh_token)
+  const credentials = JSON.stringify(OAuth2Client.credentials)
 
   if (fs.existsSync(TOKEN_PATH)) {
     fs.readFile(TOKEN_PATH, (err, token) => {
@@ -72,6 +72,8 @@ function updateToken () {
         return
       }
       const cachedCredentials = JSON.parse(token.toString())
+      console.log("Cashed: ", cachedCredentials)
+
       if (JSON.stringify(cachedCredentials) !== credentials) {
         fs.writeFile(TOKEN_PATH, credentials, (err) => {
           if (err) {

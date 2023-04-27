@@ -24,59 +24,37 @@ async function initializeConfig (boardItems) {
     let columnIdConfig = []
     const currentItem = boardItems[0] // container for the current' columns IDs (see above)
 
-    if (!(fs.existsSync(conf))) {
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0) // assume: at least one item in board. otherwise button should not exist to trigger
-      deleteDatabse(); //No config - reset database TODO: Write a case for this to not trigger
-      
-      const config = {
-        columnIds: columnIdConfig,
-        settings: {
-          createNewDatabase: false
-        }
+    columnIdConfig = await getColumnIdConfig(currentItem, columnIdConfig, 0) // assume: at least one item in board. otherwise button should not exist to trigger
+    await deleteDatabse(); //No config - reset database TODO: Write a case for this to not trigger
+    
+    const config = {
+      columnIds: columnIdConfig,
+      settings: {
+        createNewDatabase: false
       }
-      try {
-        await setConfigVariables(config)
-      } catch (err) {
-        logger.error({
-          message: `Error setting to config variables: ${err}`,
-          function: 'initializeConfig',
-          params: { config },
-          error: err.stack
-        })
-      }
-      fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) {
-          logger.error({
-            message: `Error writing to config.json: ${err}`,
-            function: 'initializeConfig',
-            params: { boardItems },
-            error: err.stack
-          })
-          return err
-        }
-        logger.info('config has been stored')
-      })
-    } else {
-      let config = fs.readFileSync(conf)
-      config = await JSON.parse(config)
-      columnIdConfig = getColumnIdConfig(currentItem, columnIdConfig, 0)
-      config.columnIds = columnIdConfig
-      config.settings.createNewDatabase = false
-
+    }
+    try {
       await setConfigVariables(config)
-
-      fs.writeFile(conf, JSON.stringify(config), (err) => {
-        if (err) {
-          logger.error({
-            message: `Error writing to config.json: ${err}`,
-            function: 'initializeConfig',
-            params: { boardItems },
-            error: err.stack
-          })
-        }
-        console.log('config has been updated')
+    } catch (err) {
+      logger.error({
+        message: `Error setting to config variables: ${err}`,
+        function: 'initializeConfig',
+        params: { config },
+        error: err.stack
       })
     }
+    fs.writeFile(conf, JSON.stringify(config), (err) => {
+      if (err) {
+        logger.error({
+          message: `Error writing to config.json: ${err}`,
+          function: 'initializeConfig',
+          params: { boardItems },
+          error: err.stack
+        })
+        return err
+      }
+      logger.info('config has been stored')
+    })
 
     return null
   } catch (err) {
@@ -90,7 +68,7 @@ async function initializeConfig (boardItems) {
   }
 }
 
-function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
+async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
   for (let i = 0; i < currentItem.column_values.length; i++) {
     const currentColumn = currentItem.column_values[i]
     const columnId = currentColumn.id

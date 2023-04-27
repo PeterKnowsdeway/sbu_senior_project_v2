@@ -1,3 +1,4 @@
+const { configVariables } = require('../config/config-helper.js');
 
 async function nameSplit (name) {
   const nameParts = name.trim().split(/\s+/) // Split on one or more whitespace characters
@@ -26,24 +27,24 @@ async function phoneFormat (phone) {
   }
 }
 
-async function formatColumnValues (itemMap, configVariables) {
+async function formatColumnValues (itemMap) {
   const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID
-  } = configVariables
+    notesID,
+  } = configVariables;
 
-  const workPhone = await phoneFormat(itemMap[workPhoneID])
-  const mobilePhone = await phoneFormat(itemMap[mobilePhoneID])
-  const primaryEmail = itemMap[primaryEmailID]
-  const secondaryEmail = itemMap[secondaryEmailID]
-  const notes = itemMap[notesID]
+  let workPhone = await phoneFormat(itemMap[workPhoneID]);
+  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
+  const primaryEmail = itemMap[primaryEmailID];
+  const secondaryEmail = itemMap[secondaryEmailID];
+  const notes = itemMap[notesID];
 
-  const arrEmails = []
-  const arrPhoneNumbers = []
-  const arrNotes = []
+  let arrEmails= []
+  let arrPhoneNumbers=[]
+  let arrNotes = []
 
   arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
   arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
@@ -54,27 +55,27 @@ async function formatColumnValues (itemMap, configVariables) {
   return {
     arrEmails,
     arrPhoneNumbers,
-    arrNotes
+    arrNotes,
   }
 }
 
-async function parseColumnValues (currentItem, configVariables) {
+async function parseColumnValues (currentItem) {
   const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID
-  } = configVariables
+    notesID,
+  } = configVariables;
 
-  const arrEmails = []
-  const arrPhoneNumbers = []
-  const arrNotes = []
+  let arrEmails = []
+  let arrPhoneNumbers=[]
+  let arrNotes = []
   let itemID = null
 
   for (const currentColumn of currentItem.column_values) {
     const columnId = currentColumn.id
-    console.log(columnId)
+
     switch (columnId) {
       case primaryEmailID:
         arrEmails.push({ value: currentColumn.text, type: 'work', formattedType: 'Work' })
@@ -96,6 +97,11 @@ async function parseColumnValues (currentItem, configVariables) {
         break
     }
   }
+
+  console.log("arrays: ", arrEmails, " || ",
+    arrPhoneNumbers, " || ",
+    arrNotes, " || ",
+    itemID)
 
   return {
     arrEmails,
