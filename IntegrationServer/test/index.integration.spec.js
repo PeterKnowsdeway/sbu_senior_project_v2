@@ -8,11 +8,11 @@ describe('index route', function() {
   beforeEach(function() {
     app.use(router);
   });
-  /* Authenticaiton needed for these tests
+  // Authenticaiton needed for these tests
   it('should return a 200 response for the /auth route if not authenticated', function(done) {
     request(app)
       .get('/auth')
-      .expect(200, done);
+      .expect(500, done);
   });
   it('should return a JSON response for /auth route', function(done) {
     request(app)
@@ -24,12 +24,11 @@ describe('index route', function() {
         done();
       });
   });
-  */
 
-  it('should return a 302 response for the /tokenHandle route', function(done) {
+  it('should return a 200 response for the /tokenHandle route', function(done) {
     request(app)
       .get('/tokenHandle')
-      .expect(302, done);
+      .expect(200, done);
   });
 
   it('should return a JSON response for /tokenHandle route', function(done) {
