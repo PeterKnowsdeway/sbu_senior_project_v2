@@ -19,36 +19,40 @@ const client = redis.createClient({
 client.on('connect', () => console.log('Redis Client Connected'))
 client.on('error', (err) => console.log('Redis Client Connection Error', err))
 
-async function asyncGet (key) {
-  try {
-    // If Redis client is not connected, connect to Redis
-    // Attempt to retrieve data from Redis
-    const data = await client.get(key)
-    console.log(data)
-    return data
-  } catch (err) {
-    throw err
-  }
+function asyncGet(key) {
+  return new Promise((resolve, reject) => {
+    client.get(key, (err, reply) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(reply)
+      }
+    })
+  })
 }
 
-async function asyncSet (key, value) {
-  try {
-    // If Redis client is not connected, connect to Redis
-    // Attempt to retrieve data from Redis
-    const data = await client.set(key, value)
-    return data
-  } catch (err) {
-    throw err
-  }
+function asyncSet(key, value) {
+  return new Promise((resolve, reject) => {
+    client.set(key, value, (err, reply) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(reply)
+      }
+    })
+  })
 }
 
-async function asyncDel (key) {
-  try {
-    const result = await client.del(key)
-    return result
-  } catch (err) {
-    throw err
-  }
+function asyncDel(key) {
+  return new Promise((resolve, reject) => {
+    client.del(key, (err, reply) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(reply)
+      }
+    })
+  })
 }
 
 module.exports = {
