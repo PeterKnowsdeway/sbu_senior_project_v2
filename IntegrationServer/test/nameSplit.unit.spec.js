@@ -1,6 +1,6 @@
 const chai = require('chai')
 const assert = chai.assert
-const { nameSplit }  = require('../src/utils/contact-parser.js');
+const { nameSplit }  = require('../src/util/contact-parser.js');
 
 describe('nameSplit', function () {
   it('should split a name into an array with three elements', async function () {
