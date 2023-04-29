@@ -40,7 +40,7 @@ function updateToken(){
 		fs.readFile("./token.json", (err, token) => {
 			if (err) return console.error(err);
 			if(!(token == credentials)) {
-				fs.writeFile("./token.json", credentials, (err) => {
+				fs.writeFile("./token.json", credentials, { flag: 'w' }, (err) => {
 					if (err) return console.error(err);
 					console.log('Cached token updated');
 				});
