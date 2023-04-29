@@ -2,11 +2,13 @@ require('dotenv').config(); //required for us to use process.env
 var express = require('express'); //node.js express
 var bodyParser = require('body-parser'); //node.js filter for POSTs
 var app = express(); //express instance.
+const swaggerUI = require("swagger-ui-express")
 
 const routes = require('./routes'); //Import all of the exported router objects from the routes folder into this file.
 //Telling the app to "listen at" with routes passed in will enable all the defined endpoints.
 const {setOAuthCredentials} = require('./startup-helper.js');
-const {loadConfigVariables} = require('./startup-helper.js');							   
+const {loadConfigVariables} = require('./startup-helper.js');
+const { specs } = require('./util/swagger.js')
 
 //require file to make it's code run upon startup.
 require('./OAuth/token-store-periodic.js'); //temporary access token refresher - schedules itself to run periodically when loaded, to keep the access token from expiring
@@ -19,6 +21,8 @@ app.use(function(req, res, next) {
   //console.log(req.query);
   next();
 });
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs))
 
 //run startup functions
 setOAuthCredentials(); //IF token.json exists (aka OAuth Credentials), load them.
