@@ -20,6 +20,7 @@
 		"mocha-junit-reporter": "^2.2.0",
 		"mock-fs": "^5.2.0",
 		"monday-sdk-js": "^0.0.12",
+		"morgan": "^1.10.0",
 		"netstat": "^0.0.2",
 		"nock": "^13.3.0",
 		"node-cache": "^5.1.2",
@@ -35,7 +36,9 @@
 		"sinon-chai": "^3.7.0",
 		"sqlite3": "^5.0.4",
 		"supertest": "^6.3.3",
-		"tmp": "^0.2.1"
+		"tmp": "^0.2.1",
+		"uuid": "^9.0.0",
+		"winston": "^3.8.2"
 	},
 	"devDependencies": {
 		"chai": "^4.3.7",
