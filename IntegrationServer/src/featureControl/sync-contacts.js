@@ -122,7 +122,7 @@ async function syncWithExistingContacts (boardItems) {
         requestID: ID,
         message: `Error: An error occcured while syncing contacts: ${err}`,
         function: 'syncWithExistingContacts',
-        params: { createNewDatabase, boardID },
+        params: { name, nameArr, itemMapping, arrEmails, arrPhoneNumbers, arrNotes, itemID },
         stacktrace: err.stack
       })
       throw error
