@@ -41,6 +41,12 @@ const specs = swaggerJsDoc(options)
 // Setting up the Swagger UI for API documentation
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
+// Setting up coverage reports endpoint for code coverage documentaiton
+app.use('/coverage', express.static('./coverage'));
+
+// Setting up JSDOCS3 endpoint for code documentaiton
+app.use('/docs', express.static('./docs'));
+
 // Parsing the request body as JSON
 app.use(bodyParser.json())
 
