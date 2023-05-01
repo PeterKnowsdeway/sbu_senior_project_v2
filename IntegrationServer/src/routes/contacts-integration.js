@@ -12,6 +12,49 @@ const mutex = new Mutex();
 
 router.use(rateLimiterUsingThirdParty);
 
+/**
+ * @swagger
+ * /create:
+ *   post:
+ *     summary: Create a new contact in Google Contacts from a Monday.com item.
+ *     tags: 
+ *       - Contacts Integration
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       description: The Monday.com item information.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               payload:
+ *                 type: object
+ *                 properties:
+ *                   inboundFieldValues:
+ *                     type: object
+ *                     properties:
+ *                       itemMapping:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           phone:
+ *                             type: string
+ *                           notes:
+ *                             type: string
+ *                       itemId:
+ *                         type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.post('/create', authenticationMiddleware, async (req, res) => {
   await mutex.runExclusive(async () => {
     await makeNewContact(req, res);
