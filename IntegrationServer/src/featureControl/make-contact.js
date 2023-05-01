@@ -1,6 +1,8 @@
 const { google } = require('googleapis');
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 google.options({auth: OAuth2Client});
+const { v4: uuidv4 } = require('uuid');
+const ID = uuidv4();
 
 const service = google.people( {version: 'v1', auth: OAuth2Client});
 
@@ -8,59 +10,94 @@ const contactMappingService = require('../services/database-services/contact-map
 
 const { configVariables } = require('../config/config-helper.js');
 
-const { createContactService } = require('../services/google-services/create-service.js') //API handler for creating and updating contacts
+const { createContactService } = require('../services/google-services/create-service.js') // API handler for creating and updating contacts
 
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') //Information parser
+const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
 
+const { logger } = require("../middleware/logger.js"); // Logging tool 
+
+/**
+  A function that creates a new contact if the provided itemId is unique.
+  @async
+  @function
+  @param {Object} req - The HTTP request object.
+  @param {Object} res - The HTTP response object.
+*/
 
 async function makeNewContact(req, res) {
   try {
-    //gets the contact info from monday.com
+    // Gets the contact info from monday.com
     const itemMap = req.body.payload.inboundFieldValues.itemMapping;
     const itemID = JSON.stringify(req.body.payload.inboundFieldValues.itemId);
 
-    //Sequilize database. Tries to get itemMapping with the same itemID if it exists for error-handling
+    // Sequilize database. Tries to get itemMapping with the same itemID if it exists for error-handling
     const itemMapping = await contactMappingService.getContactMapping(itemID);
 
-    if (itemMapping != null) { //Check if item with the given ID alreaady exists
-      console.log("Mapping already exists: aborting make contact");
+    // Check if item with the given ID alreaady exists
+    if (itemMapping !== null) {
+      logger.info({
+        pid: proccess.pid,
+        requestID: ID,
+        message: `Mapping already exists: aborting make contact`,
+        function: 'makeNewContact',
+        params: { itemMapping },
+      })
       return res.status(200).send({});
-      //if this occurs, there is either an old database-entry with the same itemID somehow. e.g. create was called twice, or the itemIDs are repeating.
-    } else { //No contact exists
+      /** 
+        if this occurs, there is either an old database-entry with the same itemID somehow. 
+        e.g. create was called twice, or the itemIDs are repeating.
+      */
+    } else { 
       const contactRes = makeContact(itemID, itemMap);
 
       return res.status(200).send({});
     }
-  } catch (error) {
+  } catch (err) {
     console.error('An error occurred:', error);
+    logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error creating new contact. Aborting: ${err}`,
+      function: 'makeNewContact',
+      params: { itemMapping },
+      stacktrace: err.stack
+    })
     return res.status(500).send({});
   }
 };
 
-////FUNCTIONS////
+/**
+  A function that creates a new Google contact with the provided contact information.
+  @async
+  @function
+  @param {string} itemID - The ID of the contact item.
+  @param {Object} itemMap - The map containing the contact information.
+  @returns {number|Object} Returns 0 if the operation is successful, and an error object otherwise.
+*/
 
-/*
- * When called, will push information for the titles located in the env with specified item information
- * @param itemID - specifies the item that has been changed
- * @param itemMap - contains the information to update object - req payload from monday.com
- * @param [callback] - what function to call in case of failure
- *        // TODO: CHECK callback param: is this something to replace with a const variable due to possible security concerns?
- */
 async function makeContact(itemID, itemMap) {
 
-  //Get info
-  const name = itemMap.name;
-  let nameArr = await nameSplit(name);
-  let { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap, configVariables)
-
-  //Request Creation
   try {
-    await createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
-  } catch(error) {
-    return error
-  }
+    //Get info
+    const name = itemMap.name;
+    let nameArr = await nameSplit(name);
+    let { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap, configVariables)
   
-  return 0;
+    //Request Creation
+    await createContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
+    
+    return 0;
+  } catch(err) {
+    logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error creating new contact. Aborting: ${err}`,
+      function: 'makeNewContact',
+      params: { itemMapping },
+      stacktrace: err.stack
+    })
+    return { error: 'An error occurred while creating the contact. Please try again later.' };
+  }
 }
 
 module.exports = {
