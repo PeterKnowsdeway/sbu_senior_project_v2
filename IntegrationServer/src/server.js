@@ -49,6 +49,7 @@ app.use(favicon('favicon.ico'))
 // Middlewares
 app.use(morgan("common"))
 app.use(helmet());
+// Body Parer by default limits payloads to 100kb
 app.use(bodyParser.json())
 app.use(cors())
 
