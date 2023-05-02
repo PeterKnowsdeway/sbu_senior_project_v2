@@ -24,6 +24,7 @@ google.options({ auth: OAuth2Client })
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
 async function setUpOAuth (req, res) {
+  console.log("I've made it to setUpOAuth")
   fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
     .then(() => {
       fs.promises.readFile(TOKEN_PATH)
@@ -51,6 +52,7 @@ async function setUpOAuth (req, res) {
 }
 
 async function codeHandle (req, res) {
+  console.log("I've made it to codeHandle")
   const backToUrl = await asyncGet(RETURN_URL_KEY)
   if (backToUrl === undefined) {
     return res.status(200).send({})
@@ -72,7 +74,8 @@ async function codeHandle (req, res) {
         OAuth2Client.getToken(code)
           .then(token => {
             OAuth2Client.credentials = token
-            fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token))
+            console.log("Token: ", token.tokens)
+            fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token.tokens))
               .then(() => {
                 return res.redirect(backToUrl)
               })

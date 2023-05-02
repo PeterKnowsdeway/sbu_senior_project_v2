@@ -11,6 +11,7 @@ schedule.scheduleJob('0 * * * *', useAccessToken); //Schedules useAccessToken to
 
 
 function useAccessToken() {
+  console.log("I've made it to useAccessToken")
   //Prevent integrations from running if no credentials are set
 	if(!(Object.keys(OAuth2Client.credentials).length === 0)) {
 		//Send a blank request to google APi, this will update the access token, and prevent it from expiring in the event the API is not used for weeks on end.
@@ -35,6 +36,7 @@ function useAccessToken() {
 // current credentials, if they are different, it writes the new credentials to the file.
 function updateToken(){
 	credentials = JSON.stringify(OAuth2Client.credentials)
+  console.log("Reached updateToken")
 		
 	if(fs.existsSync("./token.json")) {
 		fs.readFile("./token.json", (err, token) => {
