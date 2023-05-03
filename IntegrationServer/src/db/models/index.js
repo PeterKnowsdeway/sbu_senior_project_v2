@@ -8,7 +8,13 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/db.config.json')[env];
 const db = {};
 
-/* Connects to the database. */
+/**
+  Establishes a connection to a database using the provided configuration.
+  If the configuration specifies the use of an environment variable, the value of that variable is used as the database URI.
+  @param {Object} config - The configuration object containing database connection information.
+  @returns {Object} A Sequelize instance representing the connection to the database.
+*/
+
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -16,9 +22,12 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-/* Read all the files in the directory and then filter them to only include the files that end in.js. 
-Then require the funciton exported by those files and pass in the necessary info into the funciton to 
-generate return a model. Add the generated model to the db object to be exported. */
+/**
+  Reads all files in the current directory synchronously and filters out any that don't end in ".js" or start with a ".".
+  For each remaining file, requires the file as a model module and adds the resulting model to the provided "db" object.
+  @param {Object} db - The database object to add models to.
+*/
+
 fs
   .readdirSync(__dirname)
   .filter(file => {
@@ -29,8 +38,13 @@ fs
     db[model.name] = model;
   });
 
-/* Loop through the db object and check if each model has an associate
-function. If it does, calls the associate function. Since we don't have any associations, so this is never used*/
+/**
+  Loops through each model in the provided database object and calls its "associate" method,
+  if it exists.
+  @param {object} db - The database object to loop through and call "associate" on each model.
+  @returns {void}
+*/
+
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
