@@ -1,6 +1,6 @@
-const { logger } = require("../middleware/logger.js")
-const { v4: uuidv4 } = require('uuid');
-const ID = uuidv4();
+const { logger } = require('../middleware/logger.js')
+const { v4: uuidv4 } = require('uuid')
+const ID = uuidv4()
 /**
  * An object containing configuration variables.
  * @typedef {Object} configVariables
@@ -12,12 +12,12 @@ const ID = uuidv4();
  * @property {boolean} createNewDatabase - Whether to create a new database.
  */
 const configVariables = {
-	"workPhoneID": '',
-	"mobilePhoneID": '',
-	"primaryEmailID": '',
-	"secondaryEmailID": '',
-	"notesID": '',
-	"createNewDatabase": true
+  workPhoneID: '',
+  mobilePhoneID: '',
+  primaryEmailID: '',
+  secondaryEmailID: '',
+  notesID: '',
+  createNewDatabase: true
 }
 
 /**
@@ -31,19 +31,19 @@ const configVariables = {
  * @throws {Error} - If any errors occur during the assignments
  */
 
-async function setConfigVariables (config){
-	let { columnIds, settings } = config;
-  
-	let index = 0;
-	while(index < columnIds.length) {
-		let currentSection = columnIds[index]
-		switch(currentSection.title){
-			case process.env.WORK_PHONE_TITLE:
-				try {
-          configVariables.workPhoneID = currentSection.id;
+async function setConfigVariables (config) {
+  const { columnIds, settings } = config
+
+  let index = 0
+  while (index < columnIds.length) {
+    // Ignore object injeciton sink. Index is always a #
+    const currentSection = columnIds[index]
+    switch (currentSection.title) {
+      case process.env.WORK_PHONE_TITLE:
+        try {
+          configVariables.workPhoneID = currentSection.id
         } catch (error) {
           logger.error({
-            pid: proccess.pid,
             message: `Error setting workPhoneID: ${error}`,
             function: 'setConfigVariables',
             params: { configVariables, currentSection },
@@ -51,13 +51,12 @@ async function setConfigVariables (config){
           })
           throw error
         }
-				break;
-			case process.env.MOBILE_PHONE_TITLE:
-				try {
-          configVariables.mobilePhoneID = currentSection.id;
+        break
+      case process.env.MOBILE_PHONE_TITLE:
+        try {
+          configVariables.mobilePhoneID = currentSection.id
         } catch (error) {
           logger.error({
-            pid: proccess.pid,
             requestID: ID,
             message: `Error setting mobilePhoneID: ${error}`,
             function: 'setConfigVariables',
@@ -66,13 +65,12 @@ async function setConfigVariables (config){
           })
           throw error
         }
-				break;
-			case process.env.EMAIL_PRIMARY_TITLE:
-				try {
-          configVariables.primaryEmailID = currentSection.id;
+        break
+      case process.env.EMAIL_PRIMARY_TITLE:
+        try {
+          configVariables.primaryEmailID = currentSection.id
         } catch (error) {
-           logger.error({
-            pid: proccess.pid,
+          logger.error({
             requestID: ID,
             message: `Error setting primaryEmailID: ${error}`,
             function: 'setConfigVariables',
@@ -81,13 +79,12 @@ async function setConfigVariables (config){
           })
           throw error
         }
-				break;
-			case process.env.EMAIL_SECONDARY_TITLE:
-				try {
-          configVariables.secondaryEmailID = currentSection.id;
+        break
+      case process.env.EMAIL_SECONDARY_TITLE:
+        try {
+          configVariables.secondaryEmailID = currentSection.id
         } catch (error) {
-           logger.error({
-            pid: proccess.pid,
+          logger.error({
             requestID: ID,
             message: `Error setting secondaryEmailID: ${error}`,
             function: 'setConfigVariables',
@@ -96,13 +93,12 @@ async function setConfigVariables (config){
           })
           throw error
         }
-				break;
-			case process.env.NOTES_TITLE:
-				try {
-          configVariables.notesID = currentSection.id;
+        break
+      case process.env.NOTES_TITLE:
+        try {
+          configVariables.notesID = currentSection.id
         } catch (error) {
-           logger.error({
-            pid: proccess.pid,
+          logger.error({
             requestID: ID,
             message: `Error setting notesID: ${error}`,
             function: 'setConfigVariables',
@@ -111,16 +107,16 @@ async function setConfigVariables (config){
           })
           throw error
         }
-				break;
-			}
-		index++;
-	}
-	if(settings.createNewDatabase != undefined) {
-		configVariables.createNewDatabase = settings.createNewDatabase;
-	} 
+        break
+    }
+    index++
+  }
+  if (settings.createNewDatabase !== undefined) {
+    configVariables.createNewDatabase = settings.createNewDatabase
+  }
 }
 
 module.exports = {
-	configVariables,
-	setConfigVariables
+  configVariables,
+  setConfigVariables
 }
