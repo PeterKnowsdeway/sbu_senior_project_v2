@@ -10,14 +10,14 @@ async function authRequestMiddleware(req, res, next) {
 		if (!authorization && req.query) {
 			authorization = req.query.token;
 		}
-		
+
 		//at this point, we actually try and verify the request. 
 		//If the verifiy function fails, then we know that the request wasn't sent from our Monday app.
 		const {accountId, userId, backToUrl, shortLivedToken } = jswtoken.verify(
 			authorization,
 			process.env.MONDAY_SIGNING_SECRET
-		);  
-		
+		);
+
 		req.session = { accountId, userId, backToUrl, shortLivedToken };
 		next();
 	}
