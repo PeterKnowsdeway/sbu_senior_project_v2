@@ -1,48 +1,42 @@
 const fs = require('fs');
-const {google} = require('googleapis');
-const OAuth2Client = require('./google-auth.js').OAuthClient
-google.options({auth: OAuth2Client});
+const { google } = require('googleapis');
 
-function useAccessToken() {
-	if(!(Object.keys(OAuth2Client.credentials).length === 0)) {
-		var service = google.people({ version: 'v1', auth: OAuth2Client });
-		service.people.connections.list({
-			pageSize:1,
-			resourceName: 'people/me',
-			personFields: 'metadata'
-		}, (err, res) => { 
-			if (err) return console.error('The API returned an error: ' + err)
-			updateToken()
-		});
-	}	else {
-		console.log('No credentials set for access token update');
-	}
-}
+const TOKEN_PATH = './token.json'
 
-// Checks if the token.json file exists, if it does, it reads the file and compares it to the
-// current credentials, if they are different, it writes the new credentials to the file.
-function updateToken(){
-	credentials = JSON.stringify(OAuth2Client.credentials)
-	if(fs.existsSync("./token.json")) {
-		fs.readFile("./token.json", (err, token) => {
-			if (err) return console.error(err);
-			if(!(token == credentials)) {
-				fs.writeFile("./token.json", credentials, { flag: 'w' }, (err) => {
-					if (err) return console.error(err);
-					console.log('Cached token updated');
-				});
-			}
-			else {
-				console.log('No updated to cached token');
-			}	
-    });
-	}
-	console.log("Update Cached token attemped");
+const OAuth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.BACK_TO_URL)
+
+// Declares the necessary scopes from Google
+const SCOPES = ['https://www.googleapis.com/auth/contacts']
+
+// load the existing token from the token.json file
+const token = fs.readFileSync(TOKEN_PATH);
+
+// set the credentials of the OAuth2 client to the existing token
+OAuth2Client.setCredentials(JSON.parse(token));
+
+// get a new access token and refresh token
+async function getNewToken(req, res) {
+  const url = OAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: SCOPES
+  });
+  console.log('Authorize this app by visiting this url:', url);
+  console.log("I made it here")
+  const code = req.query.code; 
+  console.log("I made it here")
+  const { tokens } = await OAuth2Client.getToken(code);
+  console.log(tokens);
+  OAuth2Client.setCredentials(tokens);
+  fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
+  console.log('New access token and refresh token have been obtained and stored in token.json');
 }
 
 module.exports = {
-	updateToken,
-  useAccessToken
+	getNewToken
 };
 
 
