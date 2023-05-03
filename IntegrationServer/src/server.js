@@ -1,18 +1,20 @@
-// Importing necessary modules
-require('dotenv').config(); // Loads environment variables from a .env file into process.env.
-var express = require('express'); // Importing the express module
-var bodyParser = require('body-parser'); // Importing the bodyParser module to parse incoming request bodies
+require('dotenv').config() // Loads environment variables from a .env file into process.env.
+var express = require('express') // Importing the express module
+var bodyParser = require('body-parser') // Importing the bodyParser module to parse incoming request bodies
 var app = express(); // Creating an instance of the express application
-const cors = require('cors'); // Importing cors module to enable Cross-Origin Resource Sharing
+const cors = require('cors') // Importing cors module to enable Cross-Origin Resource Sharing
+const morgan = require("morgan")
+const helmet = require("helmet")
+var favicon = require('serve-favicon')
 
 const swaggerUI = require("swagger-ui-express") // Importing swagger UI to create API documentation
 const swaggerJsDoc = require("swagger-jsdoc") // Importing swagger-jsdoc to generate OpenAPI specifications for the API
 
-const routes = require('./routes'); // Importing the router objects from the routes folder into this file.
+const routes = require('./routes') // Importing the router objects from the routes folder into this file.
 
 // Importing the functions from startup-helper.js
-const {setOAuthCredentials} = require('./startup-helper.js');
-const {loadConfigVariables} = require('./startup-helper.js');
+const {setOAuthCredentials} = require('./startup-helper.js')
+const {loadConfigVariables} = require('./startup-helper.js')
 
 //require file to make it's code run upon startup.
 require('./OAuth/token-store-periodic.js'); //loads a file which refreshes temporary access token
@@ -33,29 +35,33 @@ const options = {
     ]
   },
   apis: ['./src/routes/*.js'] // Path to the API route files
-};
+}
 
 // Generating the swagger specification
 const specs = swaggerJsDoc(options)
 
 // Setting up the Swagger UI for API documentation
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
 
-// Parsing the request body as JSON
+// Serve Favicon
+app.use(favicon('favicon.ico'))
+
+// Middlewares
+app.use(morgan("common"))
+app.use(helmet());
+// Body Parer by default limits payloads to 100kb
 app.use(bodyParser.json())
-
-// Enabling Cross-Origin Resource Sharing
-app.use(cors());
+app.use(cors())
 
 // Middleware to log request method, path, and IP
 app.use(function(req, res, next) {
-  console.log(req.method + " " + req.path + " - " + req.ip);
+  console.log(req.method + " " + req.path + " - " + req.ip)
   next();
 });
 
 // Running the startup functions
-setOAuthCredentials(); //loads OAuth credentials if token.json exists
-loadConfigVariables(); //loads configuration variables if config.json exists
+setOAuthCredentials() // Loads OAuth credentials if token.json exists
+loadConfigVariables(); // Loads configuration variables if config.json exists
 
 // Mounting the router object to the app
 app.use(routes);
@@ -65,12 +71,12 @@ const { PORT: port } = process.env;
 
 // Determine which tunnel to run
 const run = process.env.RUN;
-if(run == "Dev") { //localTunnel is used to create a custom tunnel, if specified in the environment file
-  const {createTunnel} = require('./tunnelHelper/tunnel'); //Importing the createTunnel function from the tunnel.js system file
+if(run == "Dev") { // LocalTunnel is used to create a custom tunnel, if specified in the environment file
+  const {createTunnel} = require('./tunnelHelper/tunnel'); // Importing the createTunnel function from the tunnel.js system file
   
   // Running the app and creating the tunnel
   app.listen(port, () => {
-    createTunnel(port); //sends a request to localTunnel which will attempt to get the specified sub-domain from the .env file.
+    createTunnel(port); // Sends a request to localTunnel which will attempt to get the specified sub-domain from the .env file.
   });
 
 } else { // Running the app normally
@@ -79,4 +85,4 @@ if(run == "Dev") { //localTunnel is used to create a custom tunnel, if specified
   });
 }
 
-module.exports = app; //exporting the express application instance to use it in other files.
+module.exports = app; // Rxporting the express application instance to use it in other files.

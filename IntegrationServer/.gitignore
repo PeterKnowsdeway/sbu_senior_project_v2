@@ -6,3 +6,4 @@ node_modules
 /.env
 /token.json
 /database.sqlite3
+.npmignore

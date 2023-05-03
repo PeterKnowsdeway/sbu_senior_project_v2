@@ -29,6 +29,12 @@ async function phoneFormat(phone) {
   return phone;
 }
 
+async function isReqJSON(req) {
+  if (!req.is('json')) {
+        return res.sendStatus(415); // -> Unsupported media type if request doesn't have JSON body
+  }
+}
+
 async function formatColumnValues (itemMap) {
   const {
     primaryEmailID,
@@ -112,5 +118,6 @@ return {
 module.exports = {
   formatColumnValues,
   parseColumnValues,
-  nameSplit
+  nameSplit,
+  isReqJSON
 }

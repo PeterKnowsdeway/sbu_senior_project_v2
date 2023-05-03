@@ -1,18 +1,23 @@
-const express = require('express');
-const router = express.Router();
-const rateLimiterUsingThirdParty = require('../middleware/rateLimiter.js');
+const express = require('express')
+const router = express.Router()
+const rateLimiterUsingThirdParty = require('../middleware/rateLimiter.js')
  
 
-const hanleAuth = require('../OAuth/google-auth.js').setUpOAuth;   
-const generateToken = require('../OAuth/google-auth.js').codeHandle;
-const AuthenticationMiddleware = require('../middleware/auth-request').authRequestMiddleware;
+const handleAuth = require('../OAuth/google-auth.js').setUpOAuth   
+const generateToken = require('../OAuth/google-auth.js').codeHandle
+const AuthenticationMiddleware = require('../middleware/auth-request').authRequestMiddleware
+const { isReqJSON } = require('../util/contact-parser.js')
 
 router.use(rateLimiterUsingThirdParty);
 
-//get the required functions to use.
-console.log("I made it to OAuth-helper.js routes");
+router.get('/auth', AuthenticationMiddleware, async (req, res) => {
+  await isReqJSON(req)
+  await generateToken(req, res)
+})
 
-router.get('/auth', AuthenticationMiddleware, hanleAuth);
-router.get('/tokenHandle', generateToken);
+router.get('/tokenHandle', async (req, res) => {
+  await isReqJSON(req)
+  await handleAuth(req, res)
+})
 
 module.exports = router;
