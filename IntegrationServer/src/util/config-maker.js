@@ -79,7 +79,7 @@ async function dbCheck() {
     config = await JSON.parse(config)
 
     if(config.settings.createNewDatabase == true) {
-      deletedatabse();
+      deleteDatabse();
     }
   }
 }

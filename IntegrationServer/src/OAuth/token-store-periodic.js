@@ -1,19 +1,10 @@
-const schedule = require('node-schedule');
 const fs = require('fs');
 const {google} = require('googleapis');
-
 const OAuth2Client = require('./google-auth.js').OAuthClient
-
 google.options({auth: OAuth2Client});
 
-
-schedule.scheduleJob('0 * * * *', useAccessToken); //Schedules useAccessToken to run every ???
-
-
 function useAccessToken() {
-  //Prevent integrations from running if no credentials are set
 	if(!(Object.keys(OAuth2Client.credentials).length === 0)) {
-		//Send a blank request to google APi, this will update the access token, and prevent it from expiring in the event the API is not used for weeks on end.
 		var service = google.people({ version: 'v1', auth: OAuth2Client });
 		service.people.connections.list({
 			pageSize:1,
@@ -28,14 +19,10 @@ function useAccessToken() {
 	}
 }
 
-
-
-
 // Checks if the token.json file exists, if it does, it reads the file and compares it to the
 // current credentials, if they are different, it writes the new credentials to the file.
 function updateToken(){
 	credentials = JSON.stringify(OAuth2Client.credentials)
-		
 	if(fs.existsSync("./token.json")) {
 		fs.readFile("./token.json", (err, token) => {
 			if (err) return console.error(err);
@@ -54,7 +41,8 @@ function updateToken(){
 }
 
 module.exports = {
-	updateToken
+	updateToken,
+  useAccessToken
 };
 
 
