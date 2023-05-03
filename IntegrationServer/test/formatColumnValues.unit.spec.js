@@ -6,7 +6,7 @@ const {
   formatColumnValues,
   parseColumnValues,
   phoneFormat
-} = require('../src/utils/contact-parser.js');
+} = require('../src/util/contact-parser.js');
 
 const contactMappingService = require('../src/services/database-services/contact-mapping-service')
 

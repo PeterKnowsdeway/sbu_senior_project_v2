@@ -1,7 +1,7 @@
 const { expect } = require('chai')
 const sinon = require('sinon')
 const fs = require('fs')
-const { initializeConfig } = require('../src/utils/config-maker')
+const { initializeConfig } = require('../src/util/config-maker')
 
 describe('initializeConfig', () => {
   let boardItems = [
