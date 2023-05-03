@@ -40,19 +40,9 @@ async function fetchContacts (req, res) {
     const boardItems = await getBoardItems(shortLivedToken, boardID)
     release = await populateLock.acquire() // Mutex lock - Locks sync from triggering again if already running.
 
-    initializeConfig(boardItems)
+    await initializeConfig(boardItems)
 
-    switch (createNewDatabase) {
-      case true:
-        await syncWithExistingContacts(boardItems) // Create a NEW database (contacts)
-        break
-      case false:
-        await syncWithExistingContacts(boardItems) // Update EXISTING database (contacts)
-        break
-      default:
-        console.error('Error, config variables corrupt')
-        return res.status(500).json({ error: 'Internal Server Error' })
-    }
+    await syncWithExistingContacts(boardItems) // Create a NEW database (contacts)
 
     return res.status(200).send({})
   } catch (err) {

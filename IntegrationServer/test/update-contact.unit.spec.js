@@ -83,8 +83,3 @@ describe('updateContactInfo function', () => {
     global.setTimeout.restore();
   });
 }); */
-
-
-
-
-

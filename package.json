@@ -27,5 +27,8 @@
     "node-fetch": "^3.2.6",
     "node-schedule": "^2.1.1",
     "sequelize": "^6.28.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.39.0"
   }
 }
