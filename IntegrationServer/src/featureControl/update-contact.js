@@ -1,21 +1,9 @@
-const { google } = require('googleapis');
-const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient;
-const { v4: uuidv4 } = require('uuid');
-google.options({auth: OAuth2Client});
-
-const service = google.people({version: 'v1', auth: OAuth2Client});
-
-const contactMappingService = require('../services/database-services/contact-mapping-service');
-
-const { configVariables } = require('../config/config-helper.js');
-
-const { updateContactService } = require('../services/google-services/update-service.js') //API handler for pushing information to existing contacts
-
-const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') //Information parser
-
+const { configVariables } = require('../config/config-helper.js')
+const { updateContactService } = require('../services/google-services/update-service.js') // API handler for pushing information to existing contacts
+const { formatColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
 const { logger } = require('../middleware/logger.js')
-const ID = uuidv4();
-
+const { v4: uuidv4 } = require('uuid')
+const ID = uuidv4()
 
 /**
   Updates the contact information in the database based on the data provided in the request body.
@@ -26,26 +14,24 @@ const ID = uuidv4();
   @returns {Object} - The updated contact information in the database or an error message.
   @throws {Error} - If there is an error updating the contact information in the database.
 */
-async function updateContactInfo(req, res) {
-	const { inboundFieldValues } = req.body.payload;
-  const itemMap = inboundFieldValues.itemMapping;
-  const changedColumnId = inboundFieldValues.columnId;
-  const itemID = JSON.stringify(inboundFieldValues.itemId);
-
-	const {
+async function updateContactInfo (req, res) {
+  const { inboundFieldValues } = req.body.payload
+  const itemMap = inboundFieldValues.itemMapping
+  const changedColumnId = inboundFieldValues.columnId
+  const itemID = JSON.stringify(inboundFieldValues.itemId)
+  const {
     primaryEmailID,
     secondaryEmailID,
     workPhoneID,
     mobilePhoneID,
-    notesID,
-  } = configVariables;
-
+    notesID
+  } = configVariables
   if ([primaryEmailID, secondaryEmailID, workPhoneID, mobilePhoneID, notesID].includes(changedColumnId)) {
-		try { //Try triggering an update with payload information
-			await updateExisting(itemID, itemMap, updateExisting);
+    try { // Try triggering an update with payload information
+      await updateExisting(itemID, itemMap, updateExisting)
       return res.status(200).send({})
-		} catch(err) { //Error
-			logger.error({
+    } catch (err) { // Error
+      logger.error({
         pid: process.pid,
         requestID: ID,
         message: `Error: An error occcured while updating contacts: ${err}`,
@@ -54,18 +40,16 @@ async function updateContactInfo(req, res) {
         stacktrace: err.stack
       })
       throw err
-		}
-		return res.status(409).send({});
-	} else { //Column not a synced title
-		logger.error({
-      pid: process.pid,
+    }
+  } else { // Column not a synced title
+    logger.error({
       requestID: ID,
-      message: `Error: column not a synced title`,
+      message: 'Error: column not a synced title',
       function: 'updateContactInfo',
-      params: { itemID, itemMap },
+      params: { itemID, itemMap }
     })
-		return res.status(200).send({});
-	}
+    return res.status(200).send({})
+  }
 }
 
 /**
@@ -79,26 +63,22 @@ async function updateContactInfo(req, res) {
 */
 async function updateExisting (itemID, itemMap) {
   try {
-    // Get info
     const name = itemMap.name
     const nameArr = await nameSplit(name)
-    let { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
+    const { arrEmails, arrPhoneNumbers, arrNotes } = await formatColumnValues(itemMap)
     await updateContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
-  } catch(error){
+  } catch (err) {
     logger.error({
-      pid: process.pid,
       requestID: ID,
       message: `Error: An error occcured while updating contacts: ${err}`,
       function: 'updateExisting',
-      params: { name, nameArr, arrEmails, arrPhoneNumber, arrNotes },
       stacktrace: err.stack
     })
     throw err
   }
-
   return 0
 }
 
 module.exports = {
   updateContactInfo
-};
+}
