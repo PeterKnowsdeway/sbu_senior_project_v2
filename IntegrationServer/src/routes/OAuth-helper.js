@@ -11,12 +11,12 @@ const { isReqJSON } = require('../util/contact-parser.js')
 router.use(rateLimiterUsingThirdParty);
 
 router.get('/auth', AuthenticationMiddleware, async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await generateToken(req, res)
 })
 
 router.get('/tokenHandle', async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await handleAuth(req, res)
 })
 

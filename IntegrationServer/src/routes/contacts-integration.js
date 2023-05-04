@@ -57,28 +57,28 @@ router.use(rateLimiterUsingThirdParty);
  */
 
 router.post('/create', authenticationMiddleware, async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await mutex.runExclusive(async () => {
     await makeNewContact(req, res);
   });
 });
 
 router.post('/update', authenticationMiddleware, async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await mutex.runExclusive(async () => {
     await updateContact(req, res);
   });
 });
 
 router.post('/sync', authenticationMiddleware, async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await mutex.runExclusive(async () => {
     await fetchContacts(req, res);
   });
 });
 
 router.post('/print', authenticationMiddleware, async (req, res) => {
-  await isReqJSON(req)
+  await isReqJSON(req, res)
   await mutex.runExclusive(async () => {
     console.log(req.body);
     console.log('printRequest', JSON.stringify(req.body));
