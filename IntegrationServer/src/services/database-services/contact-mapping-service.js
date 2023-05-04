@@ -10,17 +10,15 @@ const ID = uuidv4()
  * @returns {Promise<Object>} A Promise that resolves to the retrieved contact mapping record.
  * @throws {Error} If an error occurs while querying the database.
  */
-const getContactMapping = async (itemID) => { /
+const getContactMapping = async (itemID) => { 
   try {
     const queryResult = await ContactMapping.findByPk(itemID);
     return queryResult;
   } catch (err) {
     logger.error({
-      pid: process.pid,
       requestID: ID,
       message: `Error: An error occured retrieving contact mapping: ${err}`,
       function: 'getContactMapping',
-      params: { itemID },
       stacktrace: err.stack
     }) 
     throw err
@@ -47,11 +45,9 @@ const createContactMapping = async (attributes) => {
 	}
 	catch (err) {
 		logger.error({
-      pid: process.pid,
       requestID: ID,
       message: `Error: An error occured while creating a contact mapping: ${err}`,
       function: 'createContactMapping',
-      params: { attributes },
       stacktrace: err.stack
     })
     throw err
@@ -82,11 +78,9 @@ const updateContactMapping = async (itemID, updates) => {
     return updatedContactMapping;
   } catch (err) {
     logger.error({
-      pid: process.pid,
       requestID: ID,
       message: `Error: An error occured while updating a contact mapping: ${err}`,
       function: 'updatedContactMapping',
-      params: { itemID, updates },
       stacktrace: err.stack
     })
     throw err
@@ -108,11 +102,9 @@ const deleteDatabse = async () => {
     );
   } catch (err) {
      logger.error({
-      pid: process.pid,
       requestID: ID,
       message: `Error: An error occured while deleting database: ${err}`,
       function: 'deleteDatabase',
-      params: { },
       stacktrace: err.stack
     })
     throw err
