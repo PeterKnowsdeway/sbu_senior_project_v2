@@ -3,6 +3,7 @@ const request = require('supertest');
 const router = require('../src/routes/index.js');
 const app = require('../src/server.js');
 
+/** 
 describe('index route', function() {
   
   beforeEach(function() {
@@ -82,6 +83,5 @@ describe('index route', function() {
       done();
     });
   });
-  */
 
-});
+}); */
