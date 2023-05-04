@@ -1,63 +1,121 @@
-const { ContactMapping } = require('../../db/models'); //Imports command (which extends from sequilize's db Model?) from contactmapping.js (also see ContactMapping.init)
+const { ContactMapping } = require('../../db/models'); 
+const { logger } = require('../../middleware/logger.js')
+const { v4: uuidv4 } = require('uuid');
+const ID = uuidv4()
 
-// Takes an itemID as an argument, and returns the result of a query to the database.
-const getContactMapping = async (itemID) => { //Database query to find item with matching primary key
+/**
+ * Retrieves a contact mapping record from the database by its ID.
+ * @async
+ * @param {number} itemID - The ID of the contact mapping record to retrieve.
+ * @returns {Promise<Object>} A Promise that resolves to the retrieved contact mapping record.
+ * @throws {Error} If an error occurs while querying the database.
+ */
+const getContactMapping = async (itemID) => { /
   try {
-    const queryResult = await ContactMapping.findByPk(itemID); //findByPk is sequilize search command to find a single entry using the PrimaryKey
+    const queryResult = await ContactMapping.findByPk(itemID);
     return queryResult;
   } catch (err) {
-    console.error(err); 
-    throw err;
+    logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error: An error occured retrieving contact mapping: ${err}`,
+      function: 'getContactMapping',
+      params: { itemID },
+      stacktrace: err.stack
+    }) 
+    throw err
   }
 };
 
-//Creates new entry within ContactMapping sequilize database to keep track of contacts.
+/**
+ * Creates a new contact mapping record in the database with the specified attributes.
+ * @async
+ * @param {Object} attributes - An object containing the attributes for the new contact mapping record.
+ * @param {number} attributes.itemID - The ID of the new contact mapping record.
+ * @param {string} attributes.resourceName - The resource name for the new contact mapping record.
+ * @param {string} attributes.etag - The etag value for the new contact mapping record.
+ * @throws {Error} If an error occurs while creating the contact mapping record in the database.
+ */
 const createContactMapping = async (attributes) => {
-  console.log("I made it to createContactMapping.js");
 	const {itemID, resourceName, etag} = attributes;
-	try{
+	try {
 		const newContactMapping = await ContactMapping.create( { 
-			id: itemID, // PrimaryKey - this should match monday.com itemID field for each contact
-			resourceName, // datatype Column - e.g. "Primary Email".
-			etag, // Column content - e.g. "someone@email.com"
+			id: itemID, 
+			resourceName,
+			etag,
 		});	
 	}
 	catch (err) {
-		console.log(err);
+		logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error: An error occured while creating a contact mapping: ${err}`,
+      function: 'createContactMapping',
+      params: { attributes },
+      stacktrace: err.stack
+    })
+    throw err
 	}	
 }
 
-//Updates an entry within ContactMapping sequilize database with new information
+/**
+ * Updates a contact mapping record in the database with the specified attributes.
+ * @async
+ * @param {number} itemID - The ID of the contact mapping record to update.
+ * @param {Object} updates - An object containing the updates to apply to the contact mapping record.
+ * @param {string} updates.resourceName - The updated resource name for the contact mapping record.
+ * @param {string} updates.etag - The updated etag value for the contact mapping record.
+ * @returns {Promise<number>} A Promise that resolves to the number of updated records.
+ * @throws {Error} If an error occurs while updating the contact mapping record in the database.
+ */
 const updateContactMapping = async (itemID, updates) => {
-  console.log("I made it to updateContactMapping");
   const {resourceName, etag} = updates;
   try {
     const updatedContactMapping = await ContactMapping.update(
-		{resourceName, etag},
-		{
-			where: {
-				id: itemID,
-			},
-		}
+  		{ resourceName, etag },
+    		{
+    			where: {
+    				id: itemID,
+    			},
+    		}
     );
     return updatedContactMapping;
   } catch (err) {
-    console.error(err);
+    logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error: An error occured while updating a contact mapping: ${err}`,
+      function: 'updatedContactMapping',
+      params: { itemID, updates },
+      stacktrace: err.stack
+    })
+    throw err
   }
 };
 
-//Delete ALL data from database.
+/**
+ * Deletes all contact mapping records from the database.
+ * @async
+ * @throws {Error} If an error occurs while deleting the contact mapping records from the database.
+ */
 const deleteDatabse = async () => {
-  console.log("I made it to deleteDatabase.");
   try {
-	  await ContactMapping.destroy( //Sequilize command with options set up to delete ALL data from ContactMapping
+	  await ContactMapping.destroy( 
       {
-        where: {}, // Field to specify what to delete - empty for all
-		truncate: true // option description from Sequilize.org: "[options.truncate=false]" "If set to true, dialects that support it will use TRUNCATE instead of DELETE FROM. If a table is truncated the where and limit options are ignored"
+        where: {}, 
+		    truncate: true 
       }
     );
   } catch (err) {
-    console.error(err);
+     logger.error({
+      pid: process.pid,
+      requestID: ID,
+      message: `Error: An error occured while deleting database: ${err}`,
+      function: 'deleteDatabase',
+      params: { },
+      stacktrace: err.stack
+    })
+    throw err
   }
 };
 
