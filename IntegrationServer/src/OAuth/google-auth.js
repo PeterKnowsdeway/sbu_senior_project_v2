@@ -71,8 +71,8 @@ async function codeHandle (req, res) {
         const code = req.query.code
         OAuth2Client.getToken(code)
           .then(token => {
-            OAuth2Client.credentials = token
-            fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token))
+            OAuth2Client.credentials = token.tokens
+            fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token.tokens))
               .then(() => {
                 return res.redirect(backToUrl)
               })
