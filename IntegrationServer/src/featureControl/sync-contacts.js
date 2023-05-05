@@ -64,7 +64,7 @@ async function fetchContacts (req, res) {
   @param {Array<Object>} boardItems - The array of board items to synchronize with contacts database.
   @returns {Promise<null>} - Returns a Promise which resolves to null on success.
   @throws {Error} - Throws an error if any item's synchronization fails.
-  @description This function takes an array of board items and synchronizes them with the existing contacts database. It loops through each item, parses its column values using the parseColumnValues function, and creates or updates a corresponding contact record in the database using the createContactService or updateContactService function based on whether the item already has a contactMapping in the contactMappingService. It also waits for 30 seconds after every 14th item to avoid rate limiting issues with the API. If any error occurs during the synchronization, it logs the error and throws it to the calling function.
+  @description This function takes an array of board items and synchronizes them with the existing contacts database. It loops through each item, parses its column values using the parseColumnValues function, and creates or updates a corresponding contact record in the database using the createContactService or updateContactService function based on whether the item already has a contactMapping in the contactMappingService. It also waits for 30 seconds after every 14th item to avoid rate limiting issues with the API. If any error occurs during the synchronization, it logs the error and throws it.
 */
 
 async function syncWithExistingContacts (boardItems) {
@@ -74,7 +74,7 @@ async function syncWithExistingContacts (boardItems) {
       await sleep(30000)
     }
     try {
-      // Ignore standard JS rule for the code. 'let' is needed for the variables instead on 'const'
+      // Ignore standard JS rule for the code. 'let' is needed for the variables instead of 'const'
       let currentItem = boardItems[boardItemIndex]
       let name = currentItem.name
       let nameArr = await nameSplit(name)
