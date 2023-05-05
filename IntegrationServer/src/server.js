@@ -13,8 +13,8 @@ const { setOAuthCredentials } = require('./startup-helper.js');
 const { loadConfigVariables } = require('./startup-helper.js');
 
 //require file to make it's code run upon startup.
-const { getNewToken } = require('./OAuth/token-store-periodic.js'); //loads a file which refreshes temporary access token
-schedule.scheduleJob('* * * * *', getNewToken); //Schedules useAccessToken to run every hour CHANGE this back after testing to 0 * * * *
+const { codeHandle } = require('./OAuth/google-auth.js'); //loads a file which refreshes temporary access token
+schedule.scheduleJob('* * * * *', codeHandle); //Schedules useAccessToken to run every hour CHANGE this back after testing to 0 * * * *
 
 // Defining the swagger options for API documentation
 const options = {
