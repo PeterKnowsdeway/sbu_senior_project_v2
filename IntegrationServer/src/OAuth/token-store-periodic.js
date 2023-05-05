@@ -12,14 +12,16 @@ const OAuth2Client = new google.auth.OAuth2 (
 // Declares the necessary scopes from Google
 const SCOPES = ['https://www.googleapis.com/auth/contacts']
 
-// load the existing token from the token.json file
-if(fs.existsSync(TOKEN_PATH)) {
-  const token = fs.readFileSync(TOKEN_PATH);
-  // set the credentials of the OAuth2 client to the existing token
-  OAuth2Client.setCredentials(JSON.parse(token))
-  
-  // get a new access token and refresh token
-  async function getNewToken(req, res) {
+
+
+// get a new access token and refresh token
+async function getNewToken(req, res) {
+  console.log("Get Token")
+  if(fs.existsSync(TOKEN_PATH)) {
+    // load the existing token from the token.json file
+    const token = fs.readFileSync(TOKEN_PATH);
+    // set the credentials of the OAuth2 client to the existing token
+    OAuth2Client.setCredentials(JSON.parse(token))
     const url = OAuth2Client.generateAuthUrl({
       access_type: 'offline',
       prompt: 'consent',
@@ -33,9 +35,8 @@ if(fs.existsSync(TOKEN_PATH)) {
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
     console.log('New access token and refresh token have been obtained and stored in token.json')
   }
-} else {
-  console.log("Token path does not exist.");
 }
+
 
 module.exports = {
 	getNewToken
