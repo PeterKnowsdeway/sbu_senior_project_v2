@@ -3,7 +3,7 @@ const { google } = require('googleapis')
 
 const TOKEN_PATH = './token.json'
 
-const OAuth2Client = new google.auth.OAuth2(
+const OAuth2Client = new google.auth.OAuth2 (
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.BACK_TO_URL
@@ -13,7 +13,12 @@ const OAuth2Client = new google.auth.OAuth2(
 const SCOPES = ['https://www.googleapis.com/auth/contacts']
 
 // load the existing token from the token.json file
-const token = fs.readFileSync(TOKEN_PATH)
+if(fs.existsSync(TOKEN_PATH)) {
+  const token = fs.readFileSync(TOKEN_PATH);
+  // your code here
+} else {
+  console.log("Token path does not exist.");
+}
 
 // set the credentials of the OAuth2 client to the existing token
 OAuth2Client.setCredentials(JSON.parse(token))
