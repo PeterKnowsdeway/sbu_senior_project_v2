@@ -15,28 +15,26 @@ const SCOPES = ['https://www.googleapis.com/auth/contacts']
 // load the existing token from the token.json file
 if(fs.existsSync(TOKEN_PATH)) {
   const token = fs.readFileSync(TOKEN_PATH);
-  // your code here
+  // set the credentials of the OAuth2 client to the existing token
+  OAuth2Client.setCredentials(JSON.parse(token))
+  
+  // get a new access token and refresh token
+  async function getNewToken(req, res) {
+    const url = OAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: SCOPES
+    });
+    console.log('Authorize this app by visiting this url:', url)
+    const code = req.query.code 
+    const { tokens } = await OAuth2Client.getToken(code)
+    console.log(tokens)
+    OAuth2Client.setCredentials(tokens)
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
+    console.log('New access token and refresh token have been obtained and stored in token.json')
+  }
 } else {
   console.log("Token path does not exist.");
-}
-
-// set the credentials of the OAuth2 client to the existing token
-OAuth2Client.setCredentials(JSON.parse(token))
-
-// get a new access token and refresh token
-async function getNewToken(req, res) {
-  const url = OAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    prompt: 'consent',
-    scope: SCOPES
-  });
-  console.log('Authorize this app by visiting this url:', url)
-  const code = req.query.code 
-  const { tokens } = await OAuth2Client.getToken(code)
-  console.log(tokens)
-  OAuth2Client.setCredentials(tokens)
-  fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
-  console.log('New access token and refresh token have been obtained and stored in token.json')
 }
 
 module.exports = {
