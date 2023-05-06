@@ -25,7 +25,6 @@ google.options({ auth: OAuth2Client })
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
 async function setUpOAuth (req, res) {
-  console.log("I've made it to setUpOAuth")
   fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
     .then(() => {
       fs.promises.readFile(TOKEN_PATH)
@@ -53,7 +52,6 @@ async function setUpOAuth (req, res) {
 }
 
 async function codeHandle (req, res) {
-  console.log("I've made it to codeHandle")
   const backToUrl = await asyncGet(RETURN_URL_KEY)
   if (backToUrl === undefined) {
     return res.status(200).send({})
@@ -89,33 +87,10 @@ async function codeHandle (req, res) {
           })
       })
   }
-}
-
-async function getNewToken(req, res) {
-  console.log("Get Token")
-  if(fs.existsSync(TOKEN_PATH)) {
-    // load the existing token from the token.json file
-    const token = fs.readFileSync(TOKEN_PATH);
-    // set the credentials of the OAuth2 client to the existing token
-    OAuth2Client.setCredentials(JSON.parse(token))
-    const url = OAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      prompt: 'consent',
-      scope: SCOPES
-    });
-    console.log('Authorize this app by visiting this url:', url)
-    const code = req.query.code 
-    const { tokens } = await OAuth2Client.getToken(code)
-    console.log(tokens)
-    OAuth2Client.setCredentials(tokens)
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
-    console.log('New access token and refresh token have been obtained and stored in token.json')
-  }
-}                     
+}                  
 
 module.exports = {
   codeHandle,
   setUpOAuth,
   OAuthClient: OAuth2Client,
-  getNewToken
 }
