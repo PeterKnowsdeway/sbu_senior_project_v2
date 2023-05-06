@@ -29,12 +29,13 @@ const ID = uuidv4()
 
 async function fetchContacts (req, res) {
   const { shortLivedToken } = req.session
-  const { boardID } = req.body.payload.inputFields
+  const { boardId } = req.body.payload.inputFields
   const { createNewDatabase } = configVariables
 
   let release = null
   try {
-    const boardItems = await getBoardItems(shortLivedToken, boardID)  
+    const boardItems = await getBoardItems(shortLivedToken, boardId)
+
     release = await populateLock.acquire() // Mutex lock - Locks sync from triggering again if already running.
     await initializeConfig(boardItems)
 
@@ -46,7 +47,7 @@ async function fetchContacts (req, res) {
       requestID: ID,
       message: `Error: An error occcured while syncing contacts: ${err}`,
       function: 'fetchContacts',
-      params: { createNewDatabase, boardID },
+      params: { createNewDatabase, boardId },
       stacktrace: err.stack
     })
     return res.status(500).json({ error: 'Internal Server Error' })
@@ -64,7 +65,7 @@ async function fetchContacts (req, res) {
   @param {Array<Object>} boardItems - The array of board items to synchronize with contacts database.
   @returns {Promise<null>} - Returns a Promise which resolves to null on success.
   @throws {Error} - Throws an error if any item's synchronization fails.
-  @description This function takes an array of board items and synchronizes them with the existing contacts database. It loops through each item, parses its column values using the parseColumnValues function, and creates or updates a corresponding contact record in the database using the createContactService or updateContactService function based on whether the item already has a contactMapping in the contactMappingService. It also waits for 30 seconds after every 14th item to avoid rate limiting issues with the API. If any error occurs during the synchronization, it logs the error and throws it to the calling function.
+  @description This function takes an array of board items and synchronizes them with the existing contacts database. It loops through each item, parses its column values using the parseColumnValues function, and creates or updates a corresponding contact record in the database using the createContactService or updateContactService function based on whether the item already has a contactMapping in the contactMappingService. It also waits for 30 seconds after every 14th item to avoid rate limiting issues with the API. If any error occurs during the synchronization, it logs the error and throws it.
 */
 
 async function syncWithExistingContacts (boardItems) {
@@ -74,12 +75,14 @@ async function syncWithExistingContacts (boardItems) {
       await sleep(30000)
     }
     try {
-      // Ignore standard JS rule for the code. 'let' is needed for the variables instead on 'const'
+      // Ignore standard JS rule for the code. 'let' is needed for the variables instead of 'const'
       let currentItem = boardItems[boardItemIndex]
       let name = currentItem.name
       let nameArr = await nameSplit(name)
       let { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
       let itemMapping = await contactMappingService.getContactMapping(itemID)
+
+      console.log("item num: ", boardItemIndex)
       if (itemMapping == null) {
         await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
       } else {
