@@ -91,25 +91,24 @@ async function codeHandle (req, res) {
 }
 
 async function getNewToken(req, res) {
-  console.log("Get Token")
   if(fs.existsSync(TOKEN_PATH)) {
     // load the existing token from the token.json file
     const token = fs.readFileSync(TOKEN_PATH);
-    const url = OAuth2Client.generateAuthUrl({
-      access_type: 'offline',
-      prompt: 'consent',
-      scope: SCOPES
+    OAuth2Client.setCredentials({
+      refresh_token: REFRESH_TOKEN //We need to get this refresh token
     });
-    console.log(url)
-    const client = await OAuth2Client.getClient();
-    const res = await client.request({ url });
-    console.log('Authorize this app by visiting this url:', url)
-    const code = req.query.code 
-    const { tokens } = await OAuth2Client.getToken(code)
-    console.log(tokens)
-    OAuth2Client.setCredentials(tokens)
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
-    console.log('New access token and refresh token have been obtained and stored in token.json')
+
+    OAuth2Client.refreshToken((err, tokens) => {
+      if (err) {
+        console.error('Error refreshing access token', err);
+        return;
+      }
+
+      console.log('New access token:', tokens.access_token);
+      OAuth2Client.setCredentials(tokens)
+      fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
+      console.log('New access token and refresh token have been obtained and stored in token.json')
+    });
   }
 }                     
 
