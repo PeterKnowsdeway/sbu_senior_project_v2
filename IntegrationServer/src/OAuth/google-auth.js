@@ -73,7 +73,7 @@ async function codeHandle (req, res) {
         const code = req.query.code
         OAuth2Client.getToken(code)
           .then(token => {
-            OAuth2Client.credentials = token
+            OAuth2Client.credentials = token.tokens
             console.log("Token: ", token.tokens)
             fs.promises.writeFile(TOKEN_PATH, JSON.stringify(token.tokens))
               .then(() => {
@@ -91,24 +91,16 @@ async function codeHandle (req, res) {
 }
 
 async function getNewToken(req, res) {
+  console.log("get new token");
   if(fs.existsSync(TOKEN_PATH)) {
     // load the existing token from the token.json file
-    const token = fs.readFileSync(TOKEN_PATH);
-    OAuth2Client.setCredentials({
-      refresh_token: REFRESH_TOKEN //We need to get this refresh token
-    });
-
-    OAuth2Client.refreshToken((err, tokens) => {
-      if (err) {
-        console.error('Error refreshing access token', err);
-        return;
-      }
-
-      console.log('New access token:', tokens.access_token);
-      OAuth2Client.setCredentials(tokens)
-      fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
-      console.log('New access token and refresh token have been obtained and stored in token.json')
-    });
+    let token = fs.readFileSync(TOKEN_PATH);
+    const refresh = JSON.parse(token).refresh_token;
+    console.log(refresh);
+    const newToken = await OAuth2Client.refreshToken(refresh);
+    console.log("new token", newToken)
+    OAuth2Client.setCredentials(tokens)
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
   }
 }                     
 
