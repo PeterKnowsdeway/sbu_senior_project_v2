@@ -26,10 +26,6 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
     if (err) return console.error('The API returned an error at update1: ' + err)
     else {
       let updatedMapping = await contactMappingService.getContactMapping(itemID)
-      console.log("outer service")
-
-      //THIS IS BROKEN ATM - PUSH WIPES ALL INFORMATION INSTEAD; SEE sync-contacts.js
-      //FOR THE UPDATE CASE IN FUNCTION updateExistingContact FOR COMPARISON
       await service.people.updateContact({
         resourceName: updatedMapping.dataValues.resourceName,
         sources: 'READ_SOURCE_TYPE_CONTACT',
@@ -51,7 +47,6 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
       }, async (err, res) => {
         if (err) console.error('The API returned an error at update2: ' + err)
         else {
-          console.log("inner update service")
           await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
         }
       })//end inner service

@@ -116,12 +116,12 @@ async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
       }
 
       columnIdConfig.push(obj)
-      logger.info({
+      /*logger.info({ //BROKEN ATM DO NOT UNCOMMENT; idk what's causing this to throw an error, but it is.
         requestID: ID,
         message: `Title Parsed: ${currentColumn.title} ${currentColumn.id}`,
         function: 'getColumnIdConfig',
-        params: { currentColumn, columnID, boardItemIndex }
-      }
+        params: { currentColumn, columnId, boardItemIndex },
+      })*/
     }
   }
   return columnIdConfig
@@ -153,13 +153,15 @@ async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
 */
 async function dbCheck () {
   if (!(fs.existsSync(conf))) { // no config - assume deletion.
-    deleteDatabse()
+    console.log("dbCheck: Delete database")
+    await deleteDatabse()
   } else {
     let config = fs.readFileSync(conf)
     config = await JSON.parse(config)
 
     if (config.settings.createNewDatabase === true) {
-      deleteDatabse()
+      console.log("dbCheck: Delete database")
+      await deleteDatabse()
     }
   }
 }

@@ -29,12 +29,13 @@ const ID = uuidv4()
 
 async function fetchContacts (req, res) {
   const { shortLivedToken } = req.session
-  const { boardID } = req.body.payload.inputFields
+  const { boardId } = req.body.payload.inputFields
   const { createNewDatabase } = configVariables
 
   let release = null
   try {
-    const boardItems = await getBoardItems(shortLivedToken, boardID)  
+    const boardItems = await getBoardItems(shortLivedToken, boardId)
+
     release = await populateLock.acquire() // Mutex lock - Locks sync from triggering again if already running.
     await initializeConfig(boardItems)
 
@@ -46,7 +47,7 @@ async function fetchContacts (req, res) {
       requestID: ID,
       message: `Error: An error occcured while syncing contacts: ${err}`,
       function: 'fetchContacts',
-      params: { createNewDatabase, boardID },
+      params: { createNewDatabase, boardId },
       stacktrace: err.stack
     })
     return res.status(500).json({ error: 'Internal Server Error' })
@@ -80,6 +81,8 @@ async function syncWithExistingContacts (boardItems) {
       let nameArr = await nameSplit(name)
       let { arrEmails, arrPhoneNumbers, arrNotes, itemID } = await parseColumnValues(currentItem)
       let itemMapping = await contactMappingService.getContactMapping(itemID)
+
+      console.log("item num: ", boardItemIndex)
       if (itemMapping == null) {
         await createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID)
       } else {
