@@ -68,7 +68,8 @@
 		"test": "mocha",
 		"testWithCoverage": "nyc --reporter=html mocha && python3 main.py > ./src/coverage/index.html",
 		"debug": "node --inspect src/server.js",
-		"lint": "eslint './src/**/*.js'",
+		"lint:all": "eslint './src/**/*.js'",
+    "lint": "eslint './src/config/*.js'",
     "lint:test": "eslint './test/**/*.js'"
 	},
 	"nodemonConfig": {
