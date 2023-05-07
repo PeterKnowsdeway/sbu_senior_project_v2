@@ -90,17 +90,19 @@ async function codeHandle (req, res) {
   }
 }
 
-async function getNewToken(req, res) {
-  console.log("get new token");
+async function getNewToken() {
+  console.log("reached getNewToken");
   if(fs.existsSync(TOKEN_PATH)) {
     // load the existing token from the token.json file
-    let token = fs.readFileSync(TOKEN_PATH);
+    const token = fs.readFileSync(TOKEN_PATH);
     const refresh = JSON.parse(token).refresh_token;
-    console.log(refresh);
-    const newToken = await OAuth2Client.refreshToken(refresh);
-    console.log("new token", newToken)
-    OAuth2Client.setCredentials(tokens)
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens))
+    let newToken = await OAuth2Client.refreshToken(refresh);
+
+    newToken.tokens.refresh_token = refresh
+
+    OAuth2Client.setCredentials(newToken.tokens)
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(newToken.tokens))
+    console.log("Access Token updated")
   }
 }                     
 
