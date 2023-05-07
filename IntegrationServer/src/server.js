@@ -1,7 +1,7 @@
 require('dotenv').config(); // Loads environment variables from a .env file into process.env.
-var express = require('express'); // Importing the express module
-var bodyParser = require('body-parser'); // Importing the bodyParser module to parse incoming request bodies
-var app = express(); // Creating an instance of the express application
+const express = require('express'); // Importing the express module
+const bodyParser = require('body-parser'); // Importing the bodyParser module to parse incoming request bodies
+const app = express(); // Creating an instance of the express application
 const cors = require('cors'); // Importing cors module to enable Cross-Origin Resource Sharing
 const swaggerUI = require("swagger-ui-express") // Importing swagger UI to create API documentation
 const swaggerJsDoc = require("swagger-jsdoc") // Importing swagger-jsdoc to generate OpenAPI specifications for the API
