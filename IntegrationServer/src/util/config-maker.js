@@ -73,13 +73,13 @@ async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {
 
 async function dbCheck() {
   if (!(fs.existsSync(conf))) { //no config - assume deletion.
-    deleteDatabse()
+    await deleteDatabse()
   } else {
     let config = fs.readFileSync(conf)
     config = await JSON.parse(config)
 
     if(config.settings.createNewDatabase == true) {
-      deleteDatabse();
+      await deleteDatabse();
     }
   }
 }

@@ -13,6 +13,8 @@ const swaggerJsDoc = require('swagger-jsdoc') // Importing swagger-jsdoc to gene
 
 const routes = require('./routes') // Importing the router objects from the routes folder into this file.
 
+const schedule = require('node-schedule');
+
 // Importing the functions from startup-helper.js
 const { setOAuthCredentials } = require('./startup-helper.js')
 const { loadConfigVariables } = require('./startup-helper.js')
