@@ -5,7 +5,8 @@ const { asyncGet, asyncDel, asyncSet } = require('../middleware/redis.js')
 const OAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.BACK_TO_URL)
+  process.env.BACK_TO_URL
+)
 
 // Declares the necessary scopes from Google
 const SCOPES = ['https://www.googleapis.com/auth/contacts']
@@ -24,7 +25,6 @@ google.options({ auth: OAuth2Client })
  * @returns The a redirect to URL to the Google OAuth2 page, or a redirect back to Monday.com.
  */
 async function setUpOAuth (req, res) {
-  console.log("I've made it to setUpOAuth")
   fs.promises.access(TOKEN_PATH, fs.constants.F_OK)
     .then(() => {
       fs.promises.readFile(TOKEN_PATH)
@@ -42,6 +42,7 @@ async function setUpOAuth (req, res) {
       try {
         const url = OAuth2Client.generateAuthUrl({
           access_type: 'offline',
+          prompt: 'consent',
           scope: SCOPES
         })
         return res.redirect(url)
@@ -52,7 +53,6 @@ async function setUpOAuth (req, res) {
 }
 
 async function codeHandle (req, res) {
-  console.log("I've made it to codeHandle")
   const backToUrl = await asyncGet(RETURN_URL_KEY)
   if (backToUrl === undefined) {
     return res.status(200).send({})
@@ -90,8 +90,25 @@ async function codeHandle (req, res) {
   }
 }
 
+async function getNewToken() {
+  console.log("reached getNewToken");
+  if(fs.existsSync(TOKEN_PATH)) {
+    // load the existing token from the token.json file
+    const token = fs.readFileSync(TOKEN_PATH);
+    const refresh = JSON.parse(token).refresh_token;
+    let newToken = await OAuth2Client.refreshToken(refresh);
+
+    newToken.tokens.refresh_token = refresh
+
+    OAuth2Client.setCredentials(newToken.tokens)
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(newToken.tokens))
+    console.log("Access Token updated")
+  }
+}                     
+
 module.exports = {
   codeHandle,
   setUpOAuth,
-  OAuthClient: OAuth2Client
+  OAuthClient: OAuth2Client,
+  getNewToken
 }

@@ -17,8 +17,8 @@ const routes = require('./routes') // Importing the router objects from the rout
 const { setOAuthCredentials } = require('./startup-helper.js')
 const { loadConfigVariables } = require('./startup-helper.js')
 
-// require file to make it's code run upon startup.
-require('./OAuth/token-store-periodic.js') // loads a file which refreshes temporary access token
+const { getNewToken } = require('./OAuth/google-auth.js'); //loads a file which refreshes temporary access token
+schedule.scheduleJob('0 * * * *', getNewToken); //Schedules useAccessToken to run every hour
 
 // Defining the swagger options for API documentation
 const options = {
@@ -62,9 +62,8 @@ app.use(function (req, res, next) {
   next()
 })
 
-// Running the startup functions
-setOAuthCredentials() // loads OAuth credentials if token.json exists
-loadConfigVariables() // loads configuration variables if config.json exists
+setOAuthCredentials(); //loads OAuth credentials if token.json exists
+loadConfigVariables(); //loads configuration variables if config.json exists
 
 // Mounting the router object to the app
 app.use(routes)
