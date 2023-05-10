@@ -13,7 +13,6 @@ const getContactMapping = async (itemID) => { //Database query to find item with
 
 //Creates new entry within ContactMapping sequilize database to keep track of contacts.
 const createContactMapping = async (attributes) => {
-  console.log("I made it to createContactMapping.js");
 	const {itemID, resourceName, etag} = attributes;
 	try{
 		const newContactMapping = await ContactMapping.create( { 
@@ -29,7 +28,6 @@ const createContactMapping = async (attributes) => {
 
 //Updates an entry within ContactMapping sequilize database with new information
 const updateContactMapping = async (itemID, updates) => {
-  console.log("I made it to updateContactMapping");
   const {resourceName, etag} = updates;
   try {
     const updatedContactMapping = await ContactMapping.update(
@@ -48,7 +46,6 @@ const updateContactMapping = async (itemID, updates) => {
 
 //Delete ALL data from database.
 const deleteDatabse = async () => {
-  console.log("I made it to deleteDatabase.");
   try {
 	  await ContactMapping.destroy( //Sequilize command with options set up to delete ALL data from ContactMapping
       {

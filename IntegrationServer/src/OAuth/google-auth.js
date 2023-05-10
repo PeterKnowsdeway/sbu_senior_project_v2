@@ -91,7 +91,6 @@ async function codeHandle (req, res) {
 }
 
 async function getNewToken() {
-  console.log("reached getNewToken");
   if(fs.existsSync(TOKEN_PATH)) {
     // load the existing token from the token.json file
     const token = fs.readFileSync(TOKEN_PATH);
@@ -102,7 +101,6 @@ async function getNewToken() {
 
     OAuth2Client.setCredentials(newToken.tokens)
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(newToken.tokens))
-    console.log("Access Token updated")
   }
 }                     
 

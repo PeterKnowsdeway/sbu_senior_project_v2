@@ -35,22 +35,31 @@ router.use(rateLimiterUsingThirdParty)
  *               payload:
  *                 type: object
  *                 properties:
+ *                   blockKind:
+ *                     type: string
  *                   inboundFieldValues:
  *                     type: object
  *                     properties:
- *                       itemMapping:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                           email:
- *                             type: string
- *                           phone:
- *                             type: string
- *                           notes:
- *                             type: string
+ *                       boardId:
+ *                        type: integer
  *                       itemId:
- *                         type: string
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   inputFields:
+ *                     type: object
+ *                     properties:
+ *                       boardId:
+ *                        type: integer
+ *                       itemId:
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   recipeId:
+ *                     type: integer
+ *                   integrationId:
+ *                     type: integer
+ *
  *     responses:
  *       200:
  *         description: OK
@@ -88,22 +97,30 @@ router.post('/create', authenticationMiddleware, async (req, res) => {
  *               payload:
  *                 type: object
  *                 properties:
+ *                   blockKind:
+ *                     type: string
  *                   inboundFieldValues:
  *                     type: object
  *                     properties:
- *                       itemMapping:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                           email:
- *                             type: string
- *                           phone:
- *                             type: string
- *                           notes:
- *                             type: string
+ *                       boardId:
+ *                        type: integer
  *                       itemId:
- *                         type: string
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   inputFields:
+ *                     type: object
+ *                     properties:
+ *                       boardId:
+ *                        type: integer
+ *                       itemId:
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   recipeId:
+ *                     type: integer
+ *                   integrationId:
+ *                     type: integer
  *     responses:
  *       200:
  *         description: OK
@@ -130,7 +147,7 @@ router.post('/update', authenticationMiddleware, async (req, res) => {
  *       - Contacts Integration
  *     security:
  *       - bearerAuth: []
- *     requestBody:
+  *     requestBody:
  *       description: The Monday.com item information.
  *       required: true
  *       content:
@@ -141,22 +158,30 @@ router.post('/update', authenticationMiddleware, async (req, res) => {
  *               payload:
  *                 type: object
  *                 properties:
+ *                   blockKind:
+ *                     type: string
  *                   inboundFieldValues:
  *                     type: object
  *                     properties:
- *                       itemMapping:
- *                         type: object
- *                         properties:
- *                           name:
- *                             type: string
- *                           email:
- *                             type: string
- *                           phone:
- *                             type: string
- *                           notes:
- *                             type: string
+ *                       boardId:
+ *                        type: integer
  *                       itemId:
- *                         type: string
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   inputFields:
+ *                     type: object
+ *                     properties:
+ *                       boardId:
+ *                        type: integer
+ *                       itemId:
+ *                        type: integer
+ *                       columnId:
+ *                        type: string
+ *                   recipeId:
+ *                     type: integer
+ *                   integrationId:
+ *                     type: integer
  *     responses:
  *       200:
  *         description: OK

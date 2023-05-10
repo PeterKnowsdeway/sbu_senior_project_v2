@@ -50,6 +50,19 @@ router.get('/auth', AuthenticationMiddleware, handleAuth)
  *                 refresh_token:
  *                   type: string
  *                   description: Refresh token.
+  *       '500':
+ *         description: Not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 access_token:
+ *                   type: string
+ *                   description: Access token.
+ *                 refresh_token:
+ *                   type: string
+ *                   description: Refresh token.
  */
 router.get('/tokenHandle', generateToken)
 
