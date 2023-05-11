@@ -8,12 +8,30 @@ const contactMappingService = require('../database-services/contact-mapping-serv
 
 
 /**
- * When called, will push information for the titles located in the env are for the specified item 
- * @param itemID - specifies the item that has been changed
- * @param itemMap - contains the information to update object - req payload from monday.com
- * @param [callback] - what function to call in case of failure
- *        // TODO: CHECK callback param: is this something to replace with a const variable due to possible security concerns?
- */
+  Updates an existing contact in Google People API and updates the internal contact mapping in the database
+  @async
+  @function updateContactService
+  @param {string} name - The display name of the contact
+  @param {Array.<string>} nameArr - The array containing the first, middle and last names of the contact respectively
+  @param {Array.<Object>} arrEmails - The array containing the email addresses of the contact
+  @param {Array.<Object>} arrPhoneNumbers - The array containing the phone numbers of the contact
+  @param {Array.<Object>} arrNotes - The array containing the biographies of the contact
+  @param {number} itemID - The ID of the contact to be updated
+  @returns {null}
+
+  @mermaid
+    graph TD;
+      A[updateContactService] --> B{Get Contact Mapping};
+      B --> |Success| C[People API: Get Contact];
+      C --> |Success| D[Update Contact];
+      D --> |Success| E{Update Contact Mapping};
+      B --> |Failure| F[Log Error];
+      C --> |Failure| F;
+      D --> |Failure| F;
+      E --> |Success| G[Return];
+      E --> |Failure| F;  
+*/
+
 async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) { // updates existing database.
 
   let itemMapping = await contactMappingService.getContactMapping(itemID)
@@ -48,29 +66,10 @@ async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, 
         else {
           await contactMappingService.updateContactMapping(itemID, { resourceName: res.data.resourceName, etag: res.data.etag })
         }
-      })//end inner service
+      })
     }
-  }) //end outer service
+  }) 
   return null
-}
-
-async function nameSplit(name) {
-    let nameArr = await name.split(" ");
-
-  //If there is no middle, the last name needs to be assigned to nameArr[2] for the api call
-  switch (nameArr.length == 2) {
-    case 1 :
-        nameArr[1]= "";
-        nameArr[2]= "";
-        break;
-    case 2 :
-        nameArr[2] = nameArr[1];
-        nameArr[1] = "";
-        break;
-    case 3 :
-      break;
-  }
-  return nameArr;
 }
 
 module.exports = {
