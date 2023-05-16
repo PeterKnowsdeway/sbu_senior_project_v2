@@ -45,6 +45,7 @@
 		"winston": "^3.8.2"
 	},
 	"devDependencies": {
+		"better-docs": "^2.7.2",
 		"chai": "^4.3.7",
 		"eslint": "^8.39.0",
 		"eslint-plugin-mocha": "^10.1.0",
@@ -53,6 +54,7 @@
 		"eslint-plugin-security": "^1.7.1",
 		"eslint-plugin-unicorn": "^46.0.0",
 		"jest": "^29.5.0",
+		"jsdoc-mermaid": "^1.0.0",
 		"localtunnel": "^2.0.2",
 		"mocha": "^10.2.0",
 		"nodemon": "^2.0.20",
@@ -69,8 +71,8 @@
 		"testWithCoverage": "nyc --reporter=html mocha && python3 main.py > ./src/coverage/index.html",
 		"debug": "node --inspect src/server.js",
 		"lint:all": "eslint './src/**/*.js'",
-    "lint": "eslint './src/config/*.js'",
-    "lint:test": "eslint './test/**/*.js'"
+		"lint": "eslint './src/config/*.js'",
+		"lint:test": "eslint './test/**/*.js'"
 	},
 	"nodemonConfig": {
 		"watch": [
