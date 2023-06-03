@@ -2,27 +2,23 @@
   * This loads all of the necessary dependencies and routes, sets up the application to listen on a specified port, and runs a startup script to initialize variables.
   * @module
 */
-require('dotenv').config() // Loads environment variables from a .env file into process.env.
-const express = require('express') // Importing the express module
-const bodyParser = require('body-parser') // Importing the bodyParser module to parse incoming request bodies
-const app = express() // Creating an instance of the express application
-const cors = require('cors') // Importing cors module to enable Cross-Origin Resource Sharing
-
-const swaggerUI = require('swagger-ui-express') // Importing swagger UI to create API documentation
-const swaggerJsDoc = require('swagger-jsdoc') // Importing swagger-jsdoc to generate OpenAPI specifications for the API
-
-const routes = require('./routes') // Importing the router objects from the routes folder into this file.
-
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const schedule = require('node-schedule');
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 
-// Importing the functions from startup-helper.js
-const { setOAuthCredentials } = require('./startup-helper.js')
-const { loadConfigVariables } = require('./startup-helper.js')
+const routes = require('./routes');
+const { setOAuthCredentials, loadConfigVariables } = require('./startup-helper.js');
+const { getNewToken } = require('./OAuth/google-auth.js');
+const { serve, setup } = require('swagger-ui-express');
+const { createTunnel } = require('./tunnelHelper/tunnel');
 
-const { getNewToken } = require('./OAuth/google-auth.js'); //loads a file which refreshes temporary access token
-schedule.scheduleJob('0 * * * *', getNewToken); //Schedules useAccessToken to run every hour
+const app = express();
+const port = process.env.PORT;
 
-// Defining the swagger options for API documentation
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -37,55 +33,46 @@ const options = {
       }
     ]
   },
-  apis: ['./src/routes/*.js'] // Path to the API route files
-}
+  apis: ['./src/routes/*.js']
+};
 
-// Generating the swagger specification
-const specs = swaggerJsDoc(options)
+const specs = swaggerJsDoc(options);
 
-// Setting up the Swagger UI for API documentation
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
+app.use('/api-docs', serve, setup(specs));
+app.use('/coverage', express.static('./coverage'));
+app.use('/docs', express.static('./docs'));
+app.use(bodyParser.json());
+app.use(cors());
 
-// Setting up coverage reports endpoint for code coverage documentaiton
-app.use('/coverage', express.static('./coverage'))
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${req.ip}`);
+  next();
+});
 
-// Setting up JSDOCS3 endpoint for code documentaiton
-app.use('/docs', express.static('./docs'))
+const initializeApp = async () => {
+  try {
+    await Promise.all([setOAuthCredentials(), loadConfigVariables()]);
+    schedule.scheduleJob('0 * * * *', getNewToken);
+    app.use(routes);
+    const run = process.env.RUN;
+    if (run === 'Dev') {
+      await app.listen(port);
+      createTunnel(port);
+    } else {
+      app.listen(port, () => {
+        console.log(`Listening on port: ${port}`);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading credentials or config variables:', error);
+  }
+};
 
-// Parsing the request body as JSON
-app.use(bodyParser.json())
+initializeApp();
 
-// Enabling Cross-Origin Resource Sharing
-app.use(cors())
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send('Internal Server Error');
+});
 
-// Middleware to log request method, path, and IP
-app.use(function (req, res, next) {
-  console.log(req.method + ' ' + req.path + ' - ' + req.ip)
-  next()
-})
-
-setOAuthCredentials(); //loads OAuth credentials if token.json exists
-loadConfigVariables(); //loads configuration variables if config.json exists
-
-// Mounting the router object to the app
-app.use(routes)
-
-// Getting the port number from the environment file
-const { PORT: port } = process.env
-
-// Determine which tunnel to run
-const run = process.env.RUN
-if (run === 'Dev') { // localTunnel is used to create a custom tunnel, if specified in the environment file
-  const { createTunnel } = require('./tunnelHelper/tunnel') // Importing the createTunnel function from the tunnel.js system file
-
-  // Running the app and creating the tunnel
-  app.listen(port, () => {
-    createTunnel(port) // sends a request to localTunnel which will attempt to get the specified sub-domain from the .env file.
-  })
-} else {
-  app.listen(port, () => {
-    console.log(`Listening on port: ${port}`)
-  })
-}
-
-module.exports = app
+module.exports = app;

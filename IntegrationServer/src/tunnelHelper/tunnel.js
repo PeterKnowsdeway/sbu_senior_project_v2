@@ -1,5 +1,5 @@
 const localtunnel = require('localtunnel') // Needed to run localtunnel.
-const { logger } = require('../middlleware/logger.js')
+const { logger } = require('../middleware/logger.js')
 const { v4: uuidv4 } = require('uuid')
 const ID = uuidv4()
 // In the event you are trying to run a different tunnel service by reconfiguring this file: check createTunnel's tunnel call. This is most likely part to need changing, including potentially requiring a HOST parameter.
