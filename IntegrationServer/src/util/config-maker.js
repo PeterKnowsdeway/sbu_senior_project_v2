@@ -1,4 +1,4 @@
-const conf = './config.json' // CONFIG FILE REFERENCE - this file may not exist, in which case it will be created later
+const conf = './config.json' 
 const fs = require('fs')
 
 /* Import the configVariables from the config-helper.js file. */
@@ -34,22 +34,19 @@ const { deleteDatabse } = require('../services/database-services/contact-mapping
 async function initializeConfig (boardItems) {
   try {
     let columnIdConfig = []
-    const currentItem = boardItems[0] // container for the current' columns IDs (see above)
-    columnIdConfig = await getColumnIdConfig(currentItem, columnIdConfig, 0) //assume: at least one item in board. otherwise button should not exist to trigger.
-    //This wil get the *current* columns with matching Title name. In case a header name ever changes (e.g. deleted and remade), this needs to check every time.
-
-    await dbCheck(); //Check: if config doesn't exist, or setting createNewDatabase == true, delete db.
-
-    let config = { //object to be used for setting config.json (hard copy for restarts)
+    const currentItem = boardItems[0] 
+    columnIdConfig = await getColumnIdConfig(currentItem, columnIdConfig, 0) 
+    await dbCheck()
+    let config = { 
       columnIds: columnIdConfig,
       settings: {
         createNewDatabase: false
       }
     }
 
-    await setConfigVariables(config) //internal set for server. temp.
+    await setConfigVariables(config)
 
-    fs.writeFile(conf, JSON.stringify(config), (err) => { //make/update config.json
+    fs.writeFile(conf, JSON.stringify(config), (err) => { 
       if (err) { return err }
       console.log('config has been stored')
     })
@@ -58,7 +55,7 @@ async function initializeConfig (boardItems) {
   } catch (err) {
     console.error('The initial board configuration has failed: ')
     console.error(err)
-    return 1 // Error has occured - TODO: handle in function call
+    return 1 
   }
 }
 
