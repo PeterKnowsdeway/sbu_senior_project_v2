@@ -15,21 +15,6 @@ const { deleteDatabse } = require('../services/database-services/contact-mapping
   * @param {Array} boardItems - An array of board items.
   * @throws {Error} Throws an error if the initial board configuration has failed.
   * @returns {Promise<null>} Returns a promise that resolves to null when the configuration is complete.
-  *
-  * @mermaid
-      flowchart TD;
-        subgraph initializeConfig(boardItems)
-            A[Initialize Config] --> B{Catch Error}
-            B -- Yes --> C[Log Error and Throw Error]
-            B -- No --> D[Get Column IDs]
-            D --> E{Check Config}
-            E -- Yes --> F[Create Config Object]
-            F --> G[Set Config Variables]
-            G --> H[Write to Config.json]
-            H --> I[Log Success]
-            I --> J[Return Null]
-            E -- No --> K[Delete Database]
-        end
 */
 async function initializeConfig (boardItems) {
   try {
@@ -67,14 +52,6 @@ async function initializeConfig (boardItems) {
   * @param {Array<Object>} columnIdConfig - An array of objects representing the columns' IDs and titles.
   * @param {number} boardItemIndex - The index of the current item in the board.
   * @returns {Promise<Array<Object>>} - A Promise that resolves with an array of objects representing the columns' IDs and titles.
-  * @mermaid
-  *   graph TD;
-  *     A((currentItem)) -- Iterate over column_values --> B{boardItemIndex = 0 and validTitles includes currentColumn.title?};
-  *     B -- Yes --> C((obj));
-  *     C -- Add obj to columnIdConfig --> D(columnIdConfig);
-  *     C -- Log parsed title and ID to console --> E(Logger);
-  *     B -- No --> F((End));
-  *     D --> G(Return columnIdConfig);
 */
 
 async function getColumnIdConfig (currentItem, columnIdConfig, boardItemIndex) {

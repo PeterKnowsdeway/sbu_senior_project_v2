@@ -1,21 +1,15 @@
 const { configVariables } = require('../config/config-helper.js');
 
-async function nameSplit(name) {
-    let nameArr = await name.split(" ");
+const PhoneNumber = require('libphonenumber-js');
 
-  //If there is no middle, the last name needs to be assigned to nameArr[2] for the api call
-  switch (nameArr.length == 2) {
-    case 1 :
-        nameArr[1]= "";
-        nameArr[2]= "";
-        break;
-    case 2 :
-        nameArr[2] = nameArr[1];
-        nameArr[1] = "";
-        break;
-    case 3 :
-      break;
+async function nameSplit(name) {
+  const nameArr = await name.split(" ");
+
+  if (nameArr.length !== 3) {
+    nameArr[2] = nameArr.length === 2 ? nameArr[1] : "";
+    nameArr[1] = "";
   }
+
   return nameArr;
 }
 
@@ -26,25 +20,21 @@ async function nameSplit(name) {
   @param {string} phone - A string representing a phone number.
   @returns {Promise<string>} A formatted phone number string.
   @throws {Error} Throws an error if there is an issue formatting the phone number.
-  @mermaid
-    graph LR;
-      A((Start)) --> B{Is phone defined?}
-      B -->|Yes| C{Is phone length equal to 10?}
-      C -->|Yes| D(Return formatted phone number)
-      C -->|No| E(Return original phone number)
-      B -->|No| E(Return original phone number)
-      D((Formatted Phone))
-      E((Original Phone))
 */
 
 async function phoneFormat(phone) {
 	//Try to format mobile and work phones 
-	if(phone != undefined) {
-		if(phone.length == 10) {
-			phone = await '1 ('+ phone.slice(0,3) + ') ' +  phone.substring(3,6) + '-' + phone.substring(6,10);
-		}
-	}
-  return phone;
+  if (typeof phone !== 'string') {
+    throw new Error('Phone number must be a string.');
+  }
+
+  const phoneNumber = new PhoneNumber(phone, 'US'); // Specify the default country if necessary
+
+  if (!phoneNumber.isValid()) {
+    throw new Error('Invalid phone number. Please provide a valid phone number.');
+  }
+
+  return phoneNumber.formatInternational();
 }
 
 /**
@@ -54,38 +44,6 @@ async function phoneFormat(phone) {
  * @param {object} itemMap - An object representing the column values of a board item.
  * @returns {Promise<object>} An object containing arrays of emails, phone numbers, and notes.
  * @throws {Error} Throws an error if there is an issue formatting the column values.
- * @mermaid
-    flowchart TD;
-      subgraph formatColumnValues
-        A((itemMap))
-        B{configVariables}
-        C((primaryEmail))
-        D((secondaryEmail))
-        E((workPhone))
-        F((mobilePhone))
-        G((notes))
-        H((arrEmails))
-        I((arrPhoneNumbers))
-        J((arrNotes))   
-        B -- primaryEmailID --> C
-        B -- secondaryEmailID --> D
-        B -- workPhoneID --> E
-        B -- mobilePhoneID --> F
-        B -- notesID --> G
-        E -->|async| x(phoneFormat) -->|async| I
-        F -->|async| x(phoneFormat) -->|async| I
-        C --> H
-        D --> H
-        E --> I
-        F --> I
-        G --> J
-        A --> C
-        A --> D
-        A --> E
-        A --> F
-        A --> G
-        H -->|return| J
-      end
  */
 
 async function formatColumnValues (itemMap) {
@@ -127,18 +85,6 @@ async function formatColumnValues (itemMap) {
   @param {object} currentItem - An object representing a board item.
   @returns {Promise<object>} An object containing arrays of emails, phone numbers, and notes, as well as the item ID.
   @throws {Error} Throws an error if there is an issue parsing the column values.
-  @mermaid
-    flowchart TD;
-      Start[Start] --> Process[Process]
-      Process --> End[End]
-      Process --> |Loop Through Columns| ColumnLoop[Loop Through Columns]
-      ColumnLoop --> |Check Column ID| CheckID{Column ID}
-      CheckID --> |primaryEmailID| AddWorkEmail[Add Work Email]
-      CheckID --> |secondaryEmailID| AddOtherEmail[Add Other Email]
-      CheckID --> |workPhoneID| AddWorkPhone[Add Work Phone]
-      CheckID --> |mobilePhoneID| AddMobilePhone[Add Mobile Phone]
-      CheckID --> |notesID| AddNote[Add Note]
-      CheckID --> |item_id| SaveItemID[Save Item ID]
 */
 
 async function parseColumnValues(currentItem) { 
