@@ -1,4 +1,5 @@
 const { configVariables } = require('../config/config-helper.js');
+const _ = require('lodash');
 
 const PhoneNumber = require('libphonenumber-js');
 
@@ -46,7 +47,7 @@ async function phoneFormat(phone) {
  * @throws {Error} Throws an error if there is an issue formatting the column values.
  */
 
-async function formatColumnValues (itemMap) {
+async function formatColumnValues(itemMap) {
   const {
     primaryEmailID,
     secondaryEmailID,
@@ -55,27 +56,38 @@ async function formatColumnValues (itemMap) {
     notesID,
   } = configVariables;
 
-  let workPhone = await phoneFormat(itemMap[workPhoneID]);
-  let mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
+  // Input Validation
+  if (!_.has(itemMap, primaryEmailID) || !_.has(itemMap, secondaryEmailID) || !_.has(itemMap, workPhoneID) ||
+    !_.has(itemMap, mobilePhoneID) || !_.has(itemMap, notesID)) {
+    throw new Error('Missing required properties in itemMap.');
+  }
+
+  let workPhone, mobilePhone;
+  try {
+    workPhone = await phoneFormat(itemMap[workPhoneID]);
+    mobilePhone = await phoneFormat(itemMap[mobilePhoneID]);
+  } catch (error) {
+    // Handle any errors that occur during phone number formatting
+    throw new Error('Error occurred while formatting phone numbers.');
+  }
+
   const primaryEmail = itemMap[primaryEmailID];
   const secondaryEmail = itemMap[secondaryEmailID];
   const notes = itemMap[notesID];
 
-  let arrEmails= []
-  let arrPhoneNumbers=[]
-  let arrNotes = []
+  arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' });
+  arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' });
 
-  arrEmails.push({ value: primaryEmail, type: 'work', formattedType: 'Work' })
-  arrEmails.push({ value: secondaryEmail, type: 'other', formattedType: 'Other' })
-  arrPhoneNumbers.push({ value: workPhone, type: 'work', formattedType: 'Work' })
-  arrPhoneNumbers.push({ value: mobilePhone, type: 'mobile', formattedType: 'Mobile' })
-  arrNotes.push({ value: notes, contentType: 'TEXT_PLAIN' })
+  arrPhoneNumbers.push({ value: workPhone, type: 'work', formattedType: 'Work' });
+  arrPhoneNumbers.push({ value: mobilePhone, type: 'mobile', formattedType: 'Mobile' });
+
+  arrNotes.push({ value: notes, contentType: 'TEXT_PLAIN' });
 
   return {
     arrEmails,
     arrPhoneNumbers,
     arrNotes,
-  }
+  };
 }
 
 /**

@@ -19,6 +19,7 @@
 		"jsdoc": "^4.0.2",
 		"jsonwebtoken": "^9.0.0",
 		"libphonenumber-js": "^1.10.34",
+		"lodash": "^4.17.21",
 		"memory-cache": "^0.2.0",
 		"mocha-junit-reporter": "^2.2.0",
 		"mock-fs": "^5.2.0",
