@@ -1,10 +1,9 @@
-const { google } = require('googleapis');
+const { google } = require('googleapis')
 const OAuth2Client = require('../../OAuth/google-auth.js').OAuthClient
-google.options({auth: OAuth2Client});
+const service = google.people( {version: 'v1', auth: OAuth2Client})
+const contactMappingService = require('../database-services/contact-mapping-service')
 
-const service = google.people( {version: 'v1', auth: OAuth2Client});
-
-const contactMappingService = require('../database-services/contact-mapping-service');
+google.options({auth: OAuth2Client})
 
 /**
  * Creates a new contact in Google People API and creates an internal contact mapping in the database.
@@ -17,23 +16,11 @@ const contactMappingService = require('../database-services/contact-mapping-serv
  * @param {Array.<Object>} arrNotes - An array of objects containing note information for the contact.
  * @param {string} itemID - The ID of the item associated with the contact.
  * @returns {number} - Returns 0 after completing the function.
- *
- * @mermaid
- *  flowchart TD;
- *    A[Start] --> B{Input Parameters}
- *    B --> C[Create Contact with People API]
- *    C --> D{Handle Error}
- *    D -->|Yes| E[Return Error]
- *    D -->|No| F[Create Internal Contact Mapping]
- *    F --> G[Return 0]
- */
+*/
 
 async function createContactService(name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) {
-
-  // Calls the people api to create a contact with any information that has been put into the new contact. 
-  // Normally should just be the name
   const res = await service.people.createContact({
-    requestBody: { //info to push to Google as new contact
+    requestBody: {
       names: [
             {
               displayName: name,
@@ -50,14 +37,12 @@ async function createContactService(name, nameArr, arrEmails, arrPhoneNumbers, a
     if (err) {
       return console.error('The API returned an error: ' + err)
     }
-    // Create internal contact mapping for database
     await contactMappingService.createContactMapping({
       itemID,
       resourceName: res.data.resourceName, 
       etag: res.data.etag
-    });
-  });
-  return 0;
+    })
+  })
 }
 
 module.exports = {

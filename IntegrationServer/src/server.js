@@ -2,22 +2,23 @@
   * This loads all of the necessary dependencies and routes, sets up the application to listen on a specified port, and runs a startup script to initialize variables.
   * @module
 */
-require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const schedule = require('node-schedule');
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
+require('dotenv').config()
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+const compression = require('compression')
+const schedule = require('node-schedule')
+const swaggerUI = require('swagger-ui-express')
+const swaggerJsDoc = require('swagger-jsdoc')
 
-const routes = require('./routes');
-const { setOAuthCredentials, loadConfigVariables } = require('./startup-helper.js');
-const { getNewToken } = require('./OAuth/google-auth.js');
-const { serve, setup } = require('swagger-ui-express');
-const { createTunnel } = require('./tunnelHelper/tunnel');
+const routes = require('./routes')
+const { setOAuthCredentials, loadConfigVariables } = require('./startup-helper.js')
+const { getNewToken } = require('./OAuth/google-auth.js')
+const { serve, setup } = require('swagger-ui-express')
+const { createTunnel } = require('./tunnelHelper/tunnel')
 
-const app = express();
-const port = process.env.PORT;
+const app = express()
+const port = process.env.PORT
 
 const options = {
   definition: {
@@ -43,6 +44,8 @@ app.use('/coverage', express.static('./coverage'));
 app.use('/docs', express.static('./docs'));
 app.use(bodyParser.json());
 app.use(cors());
+// Compress all requests
+app.use(compression())
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${req.ip}`);

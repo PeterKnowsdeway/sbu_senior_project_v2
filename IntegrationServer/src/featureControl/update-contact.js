@@ -52,8 +52,6 @@ async function updateExisting (itemID, itemMap) {
   } catch(error){
     return error
   }
-
-  return 0
 }
 
 module.exports = {

@@ -18,22 +18,9 @@ const contactMappingService = require('../database-services/contact-mapping-serv
   @param {Array.<Object>} arrNotes - The array containing the biographies of the contact
   @param {number} itemID - The ID of the contact to be updated
   @returns {null}
-
-  @mermaid
-    graph TD;
-      A[updateContactService] --> B{Get Contact Mapping};
-      B --> |Success| C[People API: Get Contact];
-      C --> |Success| D[Update Contact];
-      D --> |Success| E{Update Contact Mapping};
-      B --> |Failure| F[Log Error];
-      C --> |Failure| F;
-      D --> |Failure| F;
-      E --> |Success| G[Return];
-      E --> |Failure| F;  
 */
 
-async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) { // updates existing database.
-
+async function updateContactService (name, nameArr, arrEmails, arrPhoneNumbers, arrNotes, itemID) { 
   let itemMapping = await contactMappingService.getContactMapping(itemID)
 
   service.people.get({

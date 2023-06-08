@@ -1,13 +1,13 @@
 const { google } = require('googleapis')
 const OAuth2Client = require('../OAuth/google-auth.js').OAuthClient
 const contactMappingService = require('../services/database-services/contact-mapping-service')
-const { createContactService } = require('../services/google-services/create-service.js') // API handler for creating and updating contacts
-const { updateContactService } = require('../services/google-services/update-service.js') // API handler for pushing information to existing contacts
-const { configVariables } = require('../config/config-helper.js') // List of IDs for the various titles being looked at on Monday.com
+const { createContactService } = require('../services/google-services/create-service.js') 
+const { updateContactService } = require('../services/google-services/update-service.js') 
+const { configVariables } = require('../config/config-helper.js')
 const { initializeConfig } = require('../util/config-maker.js')
 const logger = require('../middleware/logger.js')
 const { getBoardItems } = require('../services/monday-service.js')
-const { parseColumnValues, nameSplit } = require('../util/contact-parser.js') // Information parser
+const { parseColumnValues, nameSplit } = require('../util/contact-parser.js') 
 const Mutex = require('async-mutex').Mutex
 const populateLock = new Mutex()
 google.options({ auth: OAuth2Client })
