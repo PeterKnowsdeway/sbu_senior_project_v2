@@ -7,6 +7,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const compression = require('compression')
+const { errorReporter } = require('express-youch');
+const morgan = require('morgan')
 const schedule = require('node-schedule')
 const swaggerUI = require('swagger-ui-express')
 const swaggerJsDoc = require('swagger-jsdoc')
@@ -43,9 +45,19 @@ app.use('/api-docs', serve, setup(specs));
 app.use('/coverage', express.static('./coverage'));
 app.use('/docs', express.static('./docs'));
 app.use(bodyParser.json());
+
+// Disable CORS
 app.use(cors());
+
 // Compress all requests
 app.use(compression())
+
+// Better Error Reporting
+app.use(errorReporter())
+
+// HTTPS REQUEST LOGGING
+app.use(morgan('combined'))
+
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${req.ip}`);
