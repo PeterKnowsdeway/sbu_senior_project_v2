@@ -12,8 +12,7 @@ const getContactMapping = async (itemID) => {
     const queryResult = await ContactMapping.findByPk(itemID)
     return queryResult
   } catch (err) {
-    console.error(err)
-    throw err
+    throw new Error(`Error retrieving contact mapping records from database: ${err.message}`)
   }
 }
 
@@ -29,14 +28,10 @@ const getContactMapping = async (itemID) => {
 const createContactMapping = async (attributes) => {
 	const {itemID, resourceName, etag} = attributes
 	try{
-		const newContactMapping = await ContactMapping.create( { 
-			id: itemID, 
-			resourceName,
-			etag,
-		})
+		await ContactMapping.create({ id: itemID, resourceName, etag })
 	}
 	catch (err) {
-		console.log(err)
+		throw new Error(`Error creating contact mapping records in database: ${err.message}`)
 	}	
 }
 
@@ -53,17 +48,10 @@ const createContactMapping = async (attributes) => {
 const updateContactMapping = async (itemID, updates) => {
   const {resourceName, etag} = updates
   try {
-    const updatedContactMapping = await ContactMapping.update(
-		{resourceName, etag},
-		{
-			where: {
-				id: itemID,
-			},
-		}
-    )
+    const updatedContactMapping = await ContactMapping.update({resourceName, etag}, { where: { id: itemID } })
     return updatedContactMapping
   } catch (err) {
-    console.error(err)
+    throw new Error(`Error updating contact mapping records from database: ${err.message}`)
   }
 }
 
@@ -74,14 +62,9 @@ const updateContactMapping = async (itemID, updates) => {
  */
 const deleteDatabse = async () => {
   try {
-	  await ContactMapping.destroy( 
-      {
-        where: {}, 
-		    truncate: true
-      }
-    )
+	  await ContactMapping.destroy({ where: {}, truncate: true })
   } catch (err) {
-    console.error(err)
+    throw new Error(`Error deleting contact mapping records from database: ${err.message}`);
   }
 }
 
